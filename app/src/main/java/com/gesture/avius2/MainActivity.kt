@@ -74,18 +74,14 @@ class MainActivity : AppCompatActivity() {
                 BINARY_GRAPH_NAME,
                 INPUT_VIDEO_STREAM_NAME,
                 OUTPUT_VIDEO_STREAM_NAME)
-        processor!!
-                .getVideoSurfaceOutput()
+        processor!!.videoSurfaceOutput
                 .setFlipY(FLIP_FRAMES_VERTICALLY)
 
         PermissionHelper.checkAndRequestCameraPermissions(this)
-        val packetCreator = processor!!.getPacketCreator()
+        val packetCreator = processor!!.packetCreator
         val inputSidePackets: MutableMap<String, Packet> = HashMap()
         inputSidePackets[INPUT_NUM_HANDS_SIDE_PACKET_NAME] = packetCreator.createInt32(NUM_HANDS)
         processor!!.setInputSidePackets(inputSidePackets)
-
-        // To show verbose logging, run:
-        // adb shell setprop log.tag.MainActivity VERBOSE
 
         // To show verbose logging, run:
         // adb shell setprop log.tag.MainActivity VERBOSE
@@ -164,8 +160,9 @@ class MainActivity : AppCompatActivity() {
 
     fun startCamera() {
         cameraHelper = CameraXPreviewHelper()
-        cameraHelper!!.setOnCameraStartedListener(
-                OnCameraStartedListener { surfaceTexture: SurfaceTexture? -> onCameraStarted(surfaceTexture!!) })
+        cameraHelper!!.setOnCameraStartedListener { surfaceTexture: SurfaceTexture? ->
+            onCameraStarted(surfaceTexture!!)
+        }
         val cameraFacing = CameraFacing.FRONT
         cameraHelper!!.startCamera(
                 this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution())
@@ -198,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         val viewGroup = findViewById<ViewGroup>(R.id.preview_display_layout)
         viewGroup.addView(previewDisplayView)
         previewDisplayView!!
-                .getHolder()
+                .holder
                 .addCallback(
                         object : SurfaceHolder.Callback {
                             override fun surfaceCreated(holder: SurfaceHolder) {
@@ -215,7 +212,7 @@ class MainActivity : AppCompatActivity() {
                         })
     }
 
-    private fun getMultiHandLandmarksDebugString(multiHandLandmarks: List<NormalizedLandmarkList>): String? {
+    private fun getMultiHandLandmarksDebugString(multiHandLandmarks: List<NormalizedLandmarkList>): String {
         if (multiHandLandmarks.isEmpty()) {
             return "No hand landmarks"
         }
@@ -223,17 +220,13 @@ class MainActivity : AppCompatActivity() {
                 Number of hands detected: ${multiHandLandmarks.size}
                 
                 """.trimIndent()
-        var handIndex = 0
-        for (landmarks in multiHandLandmarks) {
+        for ((handIndex, landmarks) in multiHandLandmarks.withIndex()) {
             multiHandLandmarksStr += """	#Hand landmarks for hand[$handIndex]: ${landmarks.landmarkCount}
-"""
-            var landmarkIndex = 0
-            for (landmark in landmarks.landmarkList) {
+                                     """
+            for ((landmarkIndex, landmark) in landmarks.landmarkList.withIndex()) {
                 multiHandLandmarksStr += """		Landmark [$landmarkIndex]: (${landmark.x}, ${landmark.y}, ${landmark.z})
-"""
-                ++landmarkIndex
+                                         """
             }
-            ++handIndex
         }
         return multiHandLandmarksStr
     }
@@ -245,14 +238,15 @@ class MainActivity : AppCompatActivity() {
             System.loadLibrary("opencv_java3")
         }
 
-        private val TAG = "MainActivity"
-        private val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu.binarypb"
-        private val INPUT_VIDEO_STREAM_NAME = "input_video"
-        private val OUTPUT_VIDEO_STREAM_NAME = "output_video"
-        private val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
-        private val INPUT_NUM_HANDS_SIDE_PACKET_NAME = "num_hands"
-        private val NUM_HANDS = 2
+        private const val TAG = "MainActivity"
+        private const val BINARY_GRAPH_NAME = "hand_tracking_mobile_gpu.binarypb"
+        private const val INPUT_VIDEO_STREAM_NAME = "input_video"
+        private const val OUTPUT_VIDEO_STREAM_NAME = "output_video"
+        private const val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
+        private const val INPUT_NUM_HANDS_SIDE_PACKET_NAME = "num_hands"
+        private const val NUM_HANDS = 2
         private val CAMERA_FACING = CameraFacing.FRONT
+
         // Flips the camera-preview frames vertically before sending them into FrameProcessor to be
         // processed in a MediaPipe graph, and flips the processed frames back when they are displayed.
         // This is needed because OpenGL represents images assuming the image origin is at the bottom-left
