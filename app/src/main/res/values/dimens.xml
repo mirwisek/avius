@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ml_login_card">30dp</dimen>
+    <dimen name="mt_login_card">90dp</dimen>
+    <dimen name="ml_login_card_internal">40dp</dimen>
+    <dimen name="mt_login_card_internal">20dp</dimen>
+    <dimen name="mb_login_card_internal">60dp</dimen>
+    <dimen name="mt_company_id">30dp</dimen>
+    <dimen name="mt_point_id">20dp</dimen>
+    <dimen name="min_height_btn">50dp</dimen>
+    <dimen name="pl_error_card">40dp</dimen>
+    <dimen name="pt_error_card">10dp</dimen>
+    <dimen name="pb_error_card">60dp</dimen>
+    <dimen name="text_error_title">20sp</dimen>
+    <dimen name="text_error_desc">12sp</dimen>
+    <dimen name="text_error_retry">12sp</dimen>
+    <dimen name="thumb_elevation">8dp</dimen>
+    <dimen name="m_logo_f_start">30dp</dimen>
+    <dimen name="size_logo_f_start">50dp</dimen>
+    <dimen name="logo_max_height">100dp</dimen>
+    <dimen name="logo_max_width">100dp</dimen>
+    <dimen name="logo_min_width">20dp</dimen>
+    <dimen name="logo_min_height">20dp</dimen>
+    <dimen name="dialog_icon_size">60dp</dimen>
+    <dimen name="dialog_fab_size">80dp</dimen>
+    <dimen name="dialog_msg_size">20sp</dimen>
+    <dimen name="fab_icon_size_f_start">60dp</dimen>
+    <dimen name="fab_size_f_start">80dp</dimen>
+    <dimen name="p_thumb_up_f_start">40dp</dimen>
+    <dimen name="p_thumb_up_btn">40dp</dimen>
+    <dimen name="size_logo_f_question">80dp</dimen>
+</resources>

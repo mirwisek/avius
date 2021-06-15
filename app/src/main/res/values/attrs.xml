@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GestureButton">
+        <attr name="thumbDrawable" format="reference" />
+        <attr name="layoutPadding" format="dimension" />
+<!--        <attr name="calendar" format="enum">-->
+<!--            <enum name="jalali" value="0" />-->
+<!--            <enum name="gregorian" value="1" />-->
+<!--        </attr>-->
+    </declare-styleable>
+</resources>

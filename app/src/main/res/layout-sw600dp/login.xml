@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/errorCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="30dp"
+        android:background="@color/white"
+        app:cardElevation="5dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingStart="@dimen/pl_error_card"
+            android:paddingEnd="@dimen/pl_error_card"
+            android:paddingTop="@dimen/pt_error_card"
+            android:paddingBottom="@dimen/pb_error_card"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:src="@drawable/ic_emoji_sad"
+                app:tint="@color/red"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:textSize="@dimen/text_error_title"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:text="Oops! Failed to add your point!"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red_light"
+                android:textSize="@dimen/text_error_desc"
+                android:layout_marginTop="20dp"
+                android:text="Something went wrong, we couldn't find your point."/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red_light"
+                android:textSize="@dimen/text_error_retry"
+                android:layout_marginTop="10dp"
+                android:text="Keep calm and try again."/>
+
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <View
+        android:id="@+id/transparency"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#6B000000"
+        android:elevation="4dp"/>
+
+    <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="3dp" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minWidth="350dp"
+            android:minHeight="150dp"
+            android:layout_marginStart="@dimen/ml_login_card_internal"
+            android:layout_marginEnd="@dimen/ml_login_card_internal"
+            android:layout_marginTop="@dimen/mt_login_card_internal"
+            android:layout_marginBottom="@dimen/mb_login_card_internal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="30dp"
+                android:src="@drawable/logo"
+                android:maxHeight="100dp"
+                android:maxWidth="100dp"
+                android:minWidth="40dp"
+                android:minHeight="40dp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/textLayoutCompanyID"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textLayoutCompanyID"
+                android:minHeight="@dimen/min_height_btn"
+                android:layout_marginTop="@dimen/mt_company_id"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/textLayoutPointID"
+                app:layout_constraintTop_toBottomOf="@id/logo">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCompanyID"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/bg"
+                    android:hint="Company's ID"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/min_height_btn"
+                android:id="@+id/textLayoutPointID"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/mt_point_id"
+                app:layout_constraintBottom_toTopOf="@id/btnSubmit"
+                app:layout_constraintTop_toBottomOf="@id/textLayoutCompanyID">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPointID"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/bg"
+                    android:hint="Point's ID"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/min_height_btn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textLayoutPointID"
+                android:textAllCaps="false"
+                style="@style/HappyButton"
+                android:layout_marginTop="@dimen/mt_point_id"
+                android:textSize="20sp"
+                android:text="Submit"/>
+
+        </LinearLayout>
+    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
