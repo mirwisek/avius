@@ -1,6 +1,7 @@
 package com.gesture.avius2
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Point
@@ -15,8 +16,12 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
 import com.google.mediapipe.formats.proto.LandmarkProto
@@ -66,30 +71,29 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_start)
-
+        setContentView(R.layout.activity_main)
 
         handler = Handler(Looper.getMainLooper())
         vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        labelText = findViewById(R.id.label)
-        labelPoints = findViewById(R.id.points)
-
-        vmMain.label.observe(this) { value ->
-            if(value == null) {
-                updateLabel("")
-            } else {
-                updateLabel(value)
-            }
-        }
-
-        vmMain.handCount.observe(this) { value ->
-            if(value != null && value > 0) {
-                updateLabel(vmMain.label.value ?: "")
-            } else {
-                updateLabel("")
-            }
-        }
+//        labelText = findViewById(R.id.label)
+//        labelPoints = findViewById(R.id.points)
+//
+//        vmMain.label.observe(this) { value ->
+//            if(value == null) {
+//                updateLabel("")
+//            } else {
+//                updateLabel(value)
+//            }
+//        }
+//
+//        vmMain.handCount.observe(this) { value ->
+//            if(value != null && value > 0) {
+//                updateLabel(vmMain.label.value ?: "")
+//            } else {
+//                updateLabel("")
+//            }
+//        }
 
         try {
             appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
@@ -97,11 +101,18 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "Cannot find application info: $e")
         }
 
+        val dialogExit = CustomDialog(this).apply {
+            setOnYesListener { exitApp() }
+            setOnNoListener { dismiss() }
+        }
+
+        findViewById<ExtendedFloatingActionButton>(R.id.fabPower).setOnClickListener {
+            dialogExit.show()
+        }
+
         previewDisplayView = SurfaceView(this)
         setupPreviewDisplayView()
 
-        // Initialize asset manager so that MediaPipe native libraries can access the app assets, e.g.,
-        // binary graphs.
 
         // Initialize asset manager so that MediaPipe native libraries can access the app assets, e.g.,
         // binary graphs.
@@ -178,6 +189,10 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
+    private fun exitApp(){
+        finish()
+    }
+
     @SuppressLint("SetTextI18n")
     private fun printPoints(nList: List<LandmarkProto.NormalizedLandmark>) {
 
@@ -206,22 +221,22 @@ class MainActivity : AppCompatActivity() {
         else
             "NO THUMB"
 
-        runOnUiThread {
-            labelPoints.text = res + "\n"
-
-//                tip.strLine(GestureCompareUtils.TIP) + "\n\n" +
-//                dip.strLine(GestureCompareUtils.DIP) + "\n\n" +
-//                pip.strLine(GestureCompareUtils.PIP) + "\n\n" +
-//                mcp.strLine(GestureCompareUtils.MCP)
-        }
+//        runOnUiThread {
+//            labelPoints.text = res + "\n"
+//
+////                tip.strLine(GestureCompareUtils.TIP) + "\n\n" +
+////                dip.strLine(GestureCompareUtils.DIP) + "\n\n" +
+////                pip.strLine(GestureCompareUtils.PIP) + "\n\n" +
+////                mcp.strLine(GestureCompareUtils.MCP)
+//        }
     }
 
     private fun updateLabel(text: String) {
-        runOnUiThread {
-            labelText.text = text
-//            handler.removeCallbacksAndMessages(null)
-//            handler.postDelayed(resetRunnable, 3000L)
-        }
+//        runOnUiThread {
+//            labelText.text = text
+////            handler.removeCallbacksAndMessages(null)
+////            handler.postDelayed(resetRunnable, 3000L)
+//        }
     }
 
     override fun onResume() {

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg"
+    android:elevation="1dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -24,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.3"/>
+        app:layout_constraintGuide_percent="0.15"/>
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -32,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.7"/>
+        app:layout_constraintGuide_percent="0.85"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gTop"
@@ -62,30 +63,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="Thumbs up to start!" />
 
-    <ImageView
+    <com.gesture.avius2.GestureButton
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/ic_bg_circle"
-        android:elevation="@dimen/thumb_elevation"
-        android:scaleType="fitCenter"
         android:id="@+id/circle"
+        app:thumbDrawable="@drawable/ic_thumb_up"
+        app:layoutPadding="10dp"
         app:layout_constraintStart_toStartOf="@id/gStart"
         app:layout_constraintEnd_toEndOf="@id/gEnd"
         app:layout_constraintTop_toTopOf="@id/gTop"
         app:layout_constraintBottom_toBottomOf="@id/gBottom"/>
-
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/ic_thumb_up"
-        android:elevation="@dimen/thumb_elevation"
-        android:scaleType="fitCenter"
-        android:padding="@dimen/p_thumb_up_f_start"
-        android:id="@+id/thumb"
-        app:layout_constraintStart_toStartOf="@id/circle"
-        app:layout_constraintEnd_toEndOf="@id/circle"
-        app:layout_constraintBottom_toBottomOf="@id/circle"
-        app:layout_constraintTop_toTopOf="@id/circle"/>
 
     <ImageView
         android:id="@+id/logo"
