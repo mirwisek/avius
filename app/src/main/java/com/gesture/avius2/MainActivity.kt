@@ -1,30 +1,42 @@
 package com.gesture.avius2
 
+import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.Point
 import android.graphics.SurfaceTexture
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.Size
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
-import com.google.mediapipe.components.CameraHelper.OnCameraStartedListener
+import com.google.mediapipe.formats.proto.LandmarkProto
 import com.google.mediapipe.formats.proto.LandmarkProto.NormalizedLandmarkList
 import com.google.mediapipe.framework.AndroidAssetUtil
 import com.google.mediapipe.framework.Packet
 import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.round
 
 class MainActivity : AppCompatActivity() {
 
     // {@link SurfaceTexture} where the camera-preview frames can be accessed.
     private var previewFrameTexture: SurfaceTexture? = null
+    private lateinit var labelText: TextView
+    private lateinit var labelPoints: TextView
 
     // {@link SurfaceView} that displays the camera-preview frames processed by a MediaPipe graph.
     private var previewDisplayView: SurfaceView? = null
@@ -46,10 +58,38 @@ class MainActivity : AppCompatActivity() {
     // Handles camera access via the {@link CameraX} Jetpack support library.
     private var cameraHelper: CameraXPreviewHelper? = null
 
+    private lateinit var vmMain: MainViewModel
+    private lateinit var handler: Handler
+    private val resetRunnable = {
+        vmMain.label.value = ""
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.fragment_start)
+
+
+        handler = Handler(Looper.getMainLooper())
+        vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        labelText = findViewById(R.id.label)
+        labelPoints = findViewById(R.id.points)
+
+        vmMain.label.observe(this) { value ->
+            if(value == null) {
+                updateLabel("")
+            } else {
+                updateLabel(value)
+            }
+        }
+
+        vmMain.handCount.observe(this) { value ->
+            if(value != null && value > 0) {
+                updateLabel(vmMain.label.value ?: "")
+            } else {
+                updateLabel("")
+            }
+        }
 
         try {
             appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
@@ -77,46 +117,110 @@ class MainActivity : AppCompatActivity() {
         processor!!.videoSurfaceOutput
                 .setFlipY(FLIP_FRAMES_VERTICALLY)
 
+
         PermissionHelper.checkAndRequestCameraPermissions(this)
         val packetCreator = processor!!.packetCreator
         val inputSidePackets: MutableMap<String, Packet> = HashMap()
         inputSidePackets[INPUT_NUM_HANDS_SIDE_PACKET_NAME] = packetCreator.createInt32(NUM_HANDS)
         processor!!.setInputSidePackets(inputSidePackets)
+//        processor!!.addConsumer {
+//            log("Consumer[${it.timestamp}] ${it.width} x ${it.height}")
+//        }
+
+//        processor!!.addPacketCallback(OUTPUT_HANDEDNESS_STREAM_NAME) { packet ->
+//            val handedness = PacketGetter.getProtoVector(packet, LandmarkProto.Landmark.parser())
+//            vmMain.handCount.value = handedness.size
+////            log("Packet:: ${handedness.size}")
+//        }
 
         // To show verbose logging, run:
         // adb shell setprop log.tag.MainActivity VERBOSE
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            processor!!.addPacketCallback(
-                    OUTPUT_LANDMARKS_STREAM_NAME
-            ) { packet: Packet ->
-                Log.v(TAG, "Received multi-hand landmarks packet.")
-                val multiHandLandmarks = PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
-                for (l in multiHandLandmarks) {
-                    Log.i("ffnet", "New row")
-                    val list = l.landmarkList
-                    val thumbTop = list[4].y
-                    val littleTop = list[20].y
-                    if (thumbTop < littleTop) {
-                        Log.i("ffnet", "Thumb up [$thumbTop, $littleTop]")
-                    } else if (list[4].y > list[20].y) {
-                        Log.i("ffnet", "Thumb down [$thumbTop, $littleTop]")
-                    }
-                    //                            for(int i = 0; i < list.size(); i++) {
-//                                NormalizedLandmark land = list.get(i);
-//                                Log.i("ffnet", "" + i + " = [" + land.getX() + "," + land.getY() + "," + land.getZ() + "] ");
-//
-//                            }
-//                            for(NormalizedLandmark j: l.getLandmarkList()) {
-//                                Log.i("ffnet", "j = [" + j.getX() + "," + j.getY() + "," + j.getZ() + "] ");
-//                            }
-                }
-                Log.v(
-                        TAG,
-                        "[TS:"
-                                + packet.timestamp
-                                + "] "
-                                + getMultiHandLandmarksDebugString(multiHandLandmarks))
+        processor!!.addPacketCallback(
+            OUTPUT_LANDMARKS_STREAM_NAME
+        ) { packet: Packet ->
+            updateLabel("")
+            Log.v(TAG, "Received multi-hand landmarks packet.")
+            val multiHandLandmarks = PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
+
+            for (l in multiHandLandmarks) {
+                val list = l.landmarkList
+                printPoints(list)
+//                val thumbTop = list[4].y
+//                val littleTop = list[20].y
+////                    val max = list.maxOfOrNull { landmark ->
+////                        landmark.y
+////                    }
+//                val exclusiveList = list.filterIndexed { i, _ -> i != 4 }
+//                val listMax = exclusiveList.maxOf { landmark -> landmark.y }
+//                val listMin = exclusiveList.minOf { landmark -> landmark.y }
+//                if(thumbTop < listMax) {
+////                        log("Thumbs up")
+//                    updateLabel("Thumbs UP")
+//                } else if(thumbTop > listMin) {
+////                        log("Thumbs down")
+//                    updateLabel("Thumbs DOWN")
+//                } else {
+////                        log("No Thumbs")
+//                    updateLabel("")
+//                }
             }
+            Log.v(
+                TAG,
+                "[TS:"
+                        + packet.timestamp
+                        + "] "
+                        + getMultiHandLandmarksDebugString(multiHandLandmarks))
+
+        }
+
+//        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+//
+//        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun printPoints(nList: List<LandmarkProto.NormalizedLandmark>) {
+
+        val dir = GestureCompareUtils.getVerticalDirection(nList)
+
+        val tip = nList.getPoints(GestureCompareUtils.TIP)
+        val dip = nList.getPoints(GestureCompareUtils.DIP)
+        val pip = nList.getPoints(GestureCompareUtils.PIP)
+        val mcp = nList.getPoints(GestureCompareUtils.MCP)
+        val thumbLine = nList.getPoints(GestureCompareUtils.THUMB_LINE)
+
+        log("Tip size is ${tip.strLine(GestureCompareUtils.TIP) }")
+
+//        val isTip = tip.areParallel()
+//        val isDip = dip.areParallel()
+//        val isPip = pip.areParallel()
+//        val isMcp = mcp.areParallel()
+        val isThumbTIP = (thumbLine + tip).areParallel(0.2F)
+        val isThumbDIP = (thumbLine + dip).areParallel(0.2F)
+        val isThumbPIP = (thumbLine + pip).areParallel(0.2F)
+        val isThumbMCP = (thumbLine + mcp).areParallel(0.2F)
+
+        val m = if(isThumbMCP) "mcp" else if(isThumbDIP) "dip" else if(isThumbPIP) "pip" else "tip"
+        val res = if(/*isTip && isDip && isPip && isMcp*/isThumbMCP || isThumbPIP || isThumbDIP || isThumbTIP)
+            "THUMB $dir" /*+ "($m)"*/
+        else
+            "NO THUMB"
+
+        runOnUiThread {
+            labelPoints.text = res + "\n"
+
+//                tip.strLine(GestureCompareUtils.TIP) + "\n\n" +
+//                dip.strLine(GestureCompareUtils.DIP) + "\n\n" +
+//                pip.strLine(GestureCompareUtils.PIP) + "\n\n" +
+//                mcp.strLine(GestureCompareUtils.MCP)
+        }
+    }
+
+    private fun updateLabel(text: String) {
+        runOnUiThread {
+            labelText.text = text
+//            handler.removeCallbacksAndMessages(null)
+//            handler.postDelayed(resetRunnable, 3000L)
         }
     }
 
@@ -133,11 +237,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-
         converter!!.close()
-
-        // Hide preview display until we re-open the camera again.
-
         // Hide preview display until we re-open the camera again.
         previewDisplayView!!.visibility = View.GONE
     }
@@ -158,7 +258,7 @@ class MainActivity : AppCompatActivity() {
         return null // No preference and let the camera (helper) decide.
     }
 
-    fun startCamera() {
+    private fun startCamera() {
         cameraHelper = CameraXPreviewHelper()
         cameraHelper!!.setOnCameraStartedListener { surfaceTexture: SurfaceTexture? ->
             onCameraStarted(surfaceTexture!!)
@@ -212,25 +312,6 @@ class MainActivity : AppCompatActivity() {
                         })
     }
 
-    private fun getMultiHandLandmarksDebugString(multiHandLandmarks: List<NormalizedLandmarkList>): String {
-        if (multiHandLandmarks.isEmpty()) {
-            return "No hand landmarks"
-        }
-        var multiHandLandmarksStr = """
-                Number of hands detected: ${multiHandLandmarks.size}
-                
-                """.trimIndent()
-        for ((handIndex, landmarks) in multiHandLandmarks.withIndex()) {
-            multiHandLandmarksStr += """	#Hand landmarks for hand[$handIndex]: ${landmarks.landmarkCount}
-                                     """
-            for ((landmarkIndex, landmark) in landmarks.landmarkList.withIndex()) {
-                multiHandLandmarksStr += """		Landmark [$landmarkIndex]: (${landmark.x}, ${landmark.y}, ${landmark.z})
-                                         """
-            }
-        }
-        return multiHandLandmarksStr
-    }
-
     companion object {
         init {
             // Load all native libraries needed by the app.
@@ -243,6 +324,7 @@ class MainActivity : AppCompatActivity() {
         private const val INPUT_VIDEO_STREAM_NAME = "input_video"
         private const val OUTPUT_VIDEO_STREAM_NAME = "output_video"
         private const val OUTPUT_LANDMARKS_STREAM_NAME = "hand_landmarks"
+        private const val OUTPUT_HANDEDNESS_STREAM_NAME = "handedness"
         private const val INPUT_NUM_HANDS_SIDE_PACKET_NAME = "num_hands"
         private const val NUM_HANDS = 2
         private val CAMERA_FACING = CameraFacing.FRONT
