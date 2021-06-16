@@ -1,26 +1,21 @@
 package com.gesture.avius2
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.graphics.Point
 import android.graphics.SurfaceTexture
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.util.Log
 import android.util.Size
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
@@ -30,10 +25,7 @@ import com.google.mediapipe.framework.AndroidAssetUtil
 import com.google.mediapipe.framework.Packet
 import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.*
-import kotlin.math.abs
 import kotlin.math.round
 
 class MainActivity : AppCompatActivity() {
@@ -42,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private var previewFrameTexture: SurfaceTexture? = null
     private lateinit var labelText: TextView
     private lateinit var labelPoints: TextView
+    private var countDownTimer: CountDownTimer? = null
 
     // {@link SurfaceView} that displays the camera-preview frames processed by a MediaPipe graph.
     private var previewDisplayView: SurfaceView? = null
@@ -66,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vmMain: MainViewModel
     private lateinit var handler: Handler
     private val resetRunnable = {
-        vmMain.label.value = ""
+        resetCounter()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +68,13 @@ class MainActivity : AppCompatActivity() {
 
         handler = Handler(Looper.getMainLooper())
         vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        val fragmentStart =
+            supportFragmentManager.findFragmentByTag(StartFragment.TAG) ?: StartFragment()
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
+            .commit()
 
 //        labelText = findViewById(R.id.label)
 //        labelPoints = findViewById(R.id.points)
@@ -101,14 +101,6 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "Cannot find application info: $e")
         }
 
-        val dialogExit = CustomDialog(this).apply {
-            setOnYesListener { exitApp() }
-            setOnNoListener { dismiss() }
-        }
-
-        findViewById<ExtendedFloatingActionButton>(R.id.fabPower).setOnClickListener {
-            dialogExit.show()
-        }
 
         previewDisplayView = SurfaceView(this)
         setupPreviewDisplayView()
@@ -120,13 +112,15 @@ class MainActivity : AppCompatActivity() {
         eglManager = EglManager(null)
 
         processor = FrameProcessor(
-                this,
-                eglManager!!.nativeContext,
-                BINARY_GRAPH_NAME,
-                INPUT_VIDEO_STREAM_NAME,
-                OUTPUT_VIDEO_STREAM_NAME)
+            this,
+            eglManager!!.nativeContext,
+            BINARY_GRAPH_NAME,
+            INPUT_VIDEO_STREAM_NAME,
+            OUTPUT_VIDEO_STREAM_NAME
+        )
+
         processor!!.videoSurfaceOutput
-                .setFlipY(FLIP_FRAMES_VERTICALLY)
+            .setFlipY(FLIP_FRAMES_VERTICALLY)
 
 
         PermissionHelper.checkAndRequestCameraPermissions(this)
@@ -134,15 +128,17 @@ class MainActivity : AppCompatActivity() {
         val inputSidePackets: MutableMap<String, Packet> = HashMap()
         inputSidePackets[INPUT_NUM_HANDS_SIDE_PACKET_NAME] = packetCreator.createInt32(NUM_HANDS)
         processor!!.setInputSidePackets(inputSidePackets)
-//        processor!!.addConsumer {
-//            log("Consumer[${it.timestamp}] ${it.width} x ${it.height}")
-//        }
 
-//        processor!!.addPacketCallback(OUTPUT_HANDEDNESS_STREAM_NAME) { packet ->
-//            val handedness = PacketGetter.getProtoVector(packet, LandmarkProto.Landmark.parser())
-//            vmMain.handCount.value = handedness.size
-////            log("Packet:: ${handedness.size}")
-//        }
+        processor!!.addPacketCallback(OUTPUT_HANDEDNESS_STREAM_NAME) { packet ->
+            val handedness = PacketGetter.getProtoVector(packet, LandmarkProto.Landmark.parser())
+            vmMain.handCount.postValue(handedness.size)
+            vmMain.handDetectedLastTimestamp.postValue(System.currentTimeMillis())
+            // Will be delaying resetRunnable while the progress completes
+            // otherwise if hand leaves the frame then resetRunnable will be called
+            handler.removeCallbacksAndMessages(null)
+            handler.postDelayed(resetRunnable, 1000L)
+//            log("Packet:: ${handedness.size} and ${handedness[0]}")
+        }
 
         // To show verbose logging, run:
         // adb shell setprop log.tag.MainActivity VERBOSE
@@ -151,36 +147,19 @@ class MainActivity : AppCompatActivity() {
         ) { packet: Packet ->
             updateLabel("")
             Log.v(TAG, "Received multi-hand landmarks packet.")
-            val multiHandLandmarks = PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
+            val multiHandLandmarks =
+                PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
 
             for (l in multiHandLandmarks) {
                 val list = l.landmarkList
                 printPoints(list)
-//                val thumbTop = list[4].y
-//                val littleTop = list[20].y
-////                    val max = list.maxOfOrNull { landmark ->
-////                        landmark.y
-////                    }
-//                val exclusiveList = list.filterIndexed { i, _ -> i != 4 }
-//                val listMax = exclusiveList.maxOf { landmark -> landmark.y }
-//                val listMin = exclusiveList.minOf { landmark -> landmark.y }
-//                if(thumbTop < listMax) {
-////                        log("Thumbs up")
-//                    updateLabel("Thumbs UP")
-//                } else if(thumbTop > listMin) {
-////                        log("Thumbs down")
-//                    updateLabel("Thumbs DOWN")
-//                } else {
-////                        log("No Thumbs")
-//                    updateLabel("")
-//                }
             }
-            Log.v(
-                TAG,
-                "[TS:"
-                        + packet.timestamp
-                        + "] "
-                        + getMultiHandLandmarksDebugString(multiHandLandmarks))
+//            Log.v(
+//                TAG,
+//                "[TS:"
+//                        + packet.timestamp
+//                        + "] "
+//                        + getMultiHandLandmarksDebugString(multiHandLandmarks))
 
         }
 
@@ -189,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-    private fun exitApp(){
+    private fun exitApp() {
         finish()
     }
 
@@ -204,7 +183,7 @@ class MainActivity : AppCompatActivity() {
         val mcp = nList.getPoints(GestureCompareUtils.MCP)
         val thumbLine = nList.getPoints(GestureCompareUtils.THUMB_LINE)
 
-        log("Tip size is ${tip.strLine(GestureCompareUtils.TIP) }")
+//        log("Tip size is ${tip.strLine(GestureCompareUtils.TIP) }")
 
 //        val isTip = tip.areParallel()
 //        val isDip = dip.areParallel()
@@ -215,20 +194,66 @@ class MainActivity : AppCompatActivity() {
         val isThumbPIP = (thumbLine + pip).areParallel(0.2F)
         val isThumbMCP = (thumbLine + mcp).areParallel(0.2F)
 
-        val m = if(isThumbMCP) "mcp" else if(isThumbDIP) "dip" else if(isThumbPIP) "pip" else "tip"
-        val res = if(/*isTip && isDip && isPip && isMcp*/isThumbMCP || isThumbPIP || isThumbDIP || isThumbTIP)
-            "THUMB $dir" /*+ "($m)"*/
-        else
-            "NO THUMB"
+        var dirInt = 0
+
+        // For label print purposes only
+        val m =
+            if (isThumbMCP) "mcp" else if (isThumbDIP) "dip" else if (isThumbPIP) "pip" else "tip"
+        val res =
+            if (/*isTip && isDip && isPip && isMcp*/isThumbMCP || isThumbPIP || isThumbDIP || isThumbTIP) {
+                dirInt = if (dir == "UP") 1 else -1
+                "THUMB $dir" /*+ "($m)"*/
+            } else {
+                dirInt = 0
+                "NO THUMB"
+            }
+
+        vmMain.updateThumbStatus(dirInt)
+
 
 //        runOnUiThread {
+
 //            labelPoints.text = res + "\n"
-//
-////                tip.strLine(GestureCompareUtils.TIP) + "\n\n" +
-////                dip.strLine(GestureCompareUtils.DIP) + "\n\n" +
-////                pip.strLine(GestureCompareUtils.PIP) + "\n\n" +
-////                mcp.strLine(GestureCompareUtils.MCP)
+
+//                tip.strLine(GestureCompareUtils.TIP) + "\n\n" +
+//                dip.strLine(GestureCompareUtils.DIP) + "\n\n" +
+//                pip.strLine(GestureCompareUtils.PIP) + "\n\n" +
+//                mcp.strLine(GestureCompareUtils.MCP)
 //        }
+    }
+
+    private fun getCountDownTimer(): CountDownTimer {
+        return object : CountDownTimer(10_000L, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                updateCounter()
+            }
+
+            override fun onFinish() {
+                Toast.makeText(this@MainActivity, "Complete", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun updateCounter() {
+        // 0 means no thumb detected
+        if (vmMain.thumbStatus.value == 0) {
+            resetCounter()
+        } else if (vmMain.hasValueChanged.value == true) {
+            resetCounter()
+            vmMain.hasValueChanged.value = false
+        } else {
+            val lastTime = vmMain.handDetectedLastTimestamp.value
+            if (lastTime != null && System.currentTimeMillis().minus(lastTime) > 1000L)
+                resetCounter()
+            else // Proceed
+                vmMain.progressTick()
+        }
+    }
+
+    private fun resetCounter() {
+        countDownTimer?.cancel()
+        countDownTimer = null
+        vmMain.progressBar.value = 0
     }
 
     private fun updateLabel(text: String) {
@@ -242,7 +267,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         converter = ExternalTextureConverter(
-                eglManager!!.context, 2)
+            eglManager!!.context, 2
+        )
         converter!!.setFlipY(FLIP_FRAMES_VERTICALLY)
         converter!!.setConsumer(processor)
         if (PermissionHelper.cameraPermissionsGranted(this)) {
@@ -257,7 +283,11 @@ class MainActivity : AppCompatActivity() {
         previewDisplayView!!.visibility = View.GONE
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
@@ -280,7 +310,8 @@ class MainActivity : AppCompatActivity() {
         }
         val cameraFacing = CameraFacing.FRONT
         cameraHelper!!.startCamera(
-                this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution())
+            this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution()
+        )
     }
 
     protected fun computeViewSize(width: Int, height: Int): Size {
@@ -288,7 +319,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     protected fun onPreviewDisplaySurfaceChanged(
-            holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+        holder: SurfaceHolder?, format: Int, width: Int, height: Int
+    ) {
         // (Re-)Compute the ideal size of the camera-preview display (the area that the
         // camera-preview frames get rendered onto, potentially with scaling and rotation)
         // based on the size of the SurfaceView that contains the display.
@@ -300,9 +332,10 @@ class MainActivity : AppCompatActivity() {
         // previewFrameTexture), and configure the output width and height as the computed
         // display size.
         converter!!.setSurfaceTextureAndAttachToGLContext(
-                previewFrameTexture,
-                if (isCameraRotated) displaySize.height else displaySize.width,
-                if (isCameraRotated) displaySize.width else displaySize.height)
+            previewFrameTexture,
+            if (isCameraRotated) displaySize.height else displaySize.width,
+            if (isCameraRotated) displaySize.width else displaySize.height
+        )
     }
 
     private fun setupPreviewDisplayView() {
@@ -310,21 +343,26 @@ class MainActivity : AppCompatActivity() {
         val viewGroup = findViewById<ViewGroup>(R.id.preview_display_layout)
         viewGroup.addView(previewDisplayView)
         previewDisplayView!!
-                .holder
-                .addCallback(
-                        object : SurfaceHolder.Callback {
-                            override fun surfaceCreated(holder: SurfaceHolder) {
-                                processor!!.videoSurfaceOutput.setSurface(holder.surface)
-                            }
+            .holder
+            .addCallback(
+                object : SurfaceHolder.Callback {
+                    override fun surfaceCreated(holder: SurfaceHolder) {
+                        processor!!.videoSurfaceOutput.setSurface(holder.surface)
+                    }
 
-                            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-                                onPreviewDisplaySurfaceChanged(holder, format, width, height)
-                            }
+                    override fun surfaceChanged(
+                        holder: SurfaceHolder,
+                        format: Int,
+                        width: Int,
+                        height: Int
+                    ) {
+                        onPreviewDisplaySurfaceChanged(holder, format, width, height)
+                    }
 
-                            override fun surfaceDestroyed(holder: SurfaceHolder) {
-                                processor!!.videoSurfaceOutput.setSurface(null)
-                            }
-                        })
+                    override fun surfaceDestroyed(holder: SurfaceHolder) {
+                        processor!!.videoSurfaceOutput.setSurface(null)
+                    }
+                })
     }
 
     companion object {

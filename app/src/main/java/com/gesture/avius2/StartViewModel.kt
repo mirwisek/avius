@@ -8,14 +8,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
-
-    val label = MutableLiveData<String>()
-    val handCount = MutableLiveData<Int>()
+class StartViewModel: ViewModel() {
 
     val oldStatus = MutableLiveData<Int>()
     val thumbStatus = MutableLiveData<Int>()
-    val timer = MutableLiveData<Int>()
     val progressBar = MutableLiveData(0)
     val hasValueChanged = MutableLiveData(false)
 
