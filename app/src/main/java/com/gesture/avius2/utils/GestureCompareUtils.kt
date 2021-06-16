@@ -1,5 +1,7 @@
-package com.gesture.avius2
+package com.gesture.avius2.utils
 
+import com.gesture.avius2.Point
+import com.gesture.avius2.roundTo
 import com.google.mediapipe.formats.proto.LandmarkProto
 import kotlin.math.abs
 

@@ -1,4 +1,4 @@
-package com.gesture.avius2
+package com.gesture.avius2.ui
 
 import android.os.*
 import androidx.fragment.app.Fragment
@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import com.gesture.avius2.R
+import com.gesture.avius2.customui.CustomDialog
+import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.mediapipe.formats.proto.LandmarkProto
 

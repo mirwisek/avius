@@ -1,4 +1,4 @@
-package com.gesture.avius2
+package com.gesture.avius2.utils
 
 import android.content.Context
 import android.util.Log

@@ -64,7 +64,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="How do you like our services?" />
 
-    <com.gesture.avius2.GestureButton
+    <com.gesture.avius2.customui.GestureButton
         android:layout_width="340dp"
         android:layout_height="340dp"
         android:id="@+id/btnThumbsUp"
@@ -74,7 +74,7 @@
         app:layout_constraintTop_toBottomOf="@id/fabQuestion"
         app:layout_constraintBottom_toTopOf="@id/logo" />
 
-    <com.gesture.avius2.GestureButton
+    <com.gesture.avius2.customui.GestureButton
         android:layout_width="340dp"
         android:layout_height="340dp"
         android:id="@+id/btnThumbsDown"

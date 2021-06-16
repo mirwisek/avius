@@ -1,7 +1,8 @@
-package com.gesture.avius2
+package com.gesture.avius2.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.gesture.avius2.R
 
 class TestActivity : AppCompatActivity() {
 

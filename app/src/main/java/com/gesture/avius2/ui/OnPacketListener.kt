@@ -1,4 +1,4 @@
-package com.gesture.avius2
+package com.gesture.avius2.ui
 
 import com.google.mediapipe.formats.proto.LandmarkProto
 
