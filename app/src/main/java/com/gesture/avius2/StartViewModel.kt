@@ -32,10 +32,11 @@ class StartViewModel: ViewModel() {
         }
     }
 
-    fun progressTick() {
-        handler = Handler(Looper.getMainLooper())
+    fun progressTick(howMuch: Int = 10) {
+//        handler = Handler(Looper.getMainLooper())
         viewModelScope.launch {
-            handler.postDelayed(progressRunnable, 120L)
+//            handler.postDelayed(progressRunnable, 120L)
+            progressBar.value = progressBar.value!!.plus(howMuch)
         }
     }
 
