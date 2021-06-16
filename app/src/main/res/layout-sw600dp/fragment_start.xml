@@ -63,6 +63,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="Thumbs up to start!" />
 
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="4dp"
+        android:layout_marginBottom="10dp"
+        android:max="30"
+        android:progress="0"
+        android:rotation="-90"
+        android:progressDrawable="@drawable/progress_ring"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:indeterminate="false"
+        android:elevation="8dp"
+        app:layout_constraintStart_toStartOf="@id/circle"
+        app:layout_constraintEnd_toEndOf="@id/circle"
+        app:layout_constraintTop_toTopOf="@id/circle"
+        app:layout_constraintBottom_toBottomOf="@id/circle"
+        />
+
     <com.gesture.avius2.GestureButton
         android:layout_width="0dp"
         android:layout_height="0dp"

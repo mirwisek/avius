@@ -119,7 +119,8 @@ class StartFragment : Fragment(), OnPacketListener {
             if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK)
                 resetCounter()
             else // Proceed
-                vmStart.progressTick()
+//                vmStart.continueProgress()
+                vmStart.tick()
         }
     }
 
