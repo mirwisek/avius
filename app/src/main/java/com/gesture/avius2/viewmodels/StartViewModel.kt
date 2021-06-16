@@ -1,4 +1,4 @@
-package com.gesture.avius2
+package com.gesture.avius2.viewmodels
 
 import android.os.Handler
 import android.os.Looper
@@ -8,38 +8,19 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
-
-    val label = MutableLiveData<String>()
-    val handCount = MutableLiveData<Int>()
+class StartViewModel: ViewModel() {
 
     val oldStatus = MutableLiveData<Int>()
     val thumbStatus = MutableLiveData<Int>()
-    val timer = MutableLiveData<Int>()
     val progressBar = MutableLiveData(0)
     val hasValueChanged = MutableLiveData(false)
 
     val handDetectedLastTimestamp = MutableLiveData<Long>()
 
-    private lateinit var handler: Handler
 
-    private val progressRunnable = {
-        progressBar.value = progressBar.value!!.plus(1)
-        checkProgress()
-    }
-
-    private fun checkProgress() {
-        if(progressBar.value!! % 10 == 0) {
-            handler.removeCallbacksAndMessages(null)
-        } else {
-            handler.postDelayed(progressRunnable, 120L)
-        }
-    }
-
-    fun progressTick() {
-        handler = Handler(Looper.getMainLooper())
+    fun tick() {
         viewModelScope.launch {
-            handler.postDelayed(progressRunnable, 120L)
+            progressBar.value = progressBar.value!!.plus(3)
         }
     }
 

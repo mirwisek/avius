@@ -1,4 +1,4 @@
-package com.gesture.avius2
+package com.gesture.avius2.ui
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
@@ -11,12 +11,14 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.gesture.avius2.R
+import com.gesture.avius2.utils.GestureCompareUtils
+import com.gesture.avius2.utils.areParallel
+import com.gesture.avius2.utils.getPoints
+import com.gesture.avius2.viewmodels.MainViewModel
 import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
 import com.google.mediapipe.formats.proto.LandmarkProto
@@ -26,7 +28,6 @@ import com.google.mediapipe.framework.Packet
 import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
 import java.util.*
-import kotlin.math.round
 
 class MainActivity : AppCompatActivity() {
 

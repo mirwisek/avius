@@ -1,10 +1,11 @@
-package com.gesture.avius2
+package com.gesture.avius2.customui
 
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import com.gesture.avius2.R
 import com.google.android.material.button.MaterialButton
 
 class CustomDialog(context: Context) : Dialog(context) {

@@ -1,10 +1,10 @@
-package com.gesture.avius2
+package com.gesture.avius2.customui
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
-import com.google.android.material.circularreveal.CircularRevealLinearLayout
+import com.gesture.avius2.R
 import com.google.android.material.circularreveal.CircularRevealRelativeLayout
 
 class GestureButton @JvmOverloads
