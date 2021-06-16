@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     private var previewFrameTexture: SurfaceTexture? = null
     private lateinit var labelText: TextView
     private lateinit var labelPoints: TextView
-    private var countDownTimer: CountDownTimer? = null
 
     // {@link SurfaceView} that displays the camera-preview frames processed by a MediaPipe graph.
     private var previewDisplayView: SurfaceView? = null
@@ -56,21 +55,21 @@ class MainActivity : AppCompatActivity() {
     // Handles camera access via the {@link CameraX} Jetpack support library.
     private var cameraHelper: CameraXPreviewHelper? = null
 
+    private val packetListeners = hashMapOf<String, OnPacketListener>()
+
     private lateinit var vmMain: MainViewModel
-    private lateinit var handler: Handler
-    private val resetRunnable = {
-        resetCounter()
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        handler = Handler(Looper.getMainLooper())
         vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
 
         val fragmentStart =
             supportFragmentManager.findFragmentByTag(StartFragment.TAG) ?: StartFragment()
+        // Add listener
+        packetListeners[StartFragment.TAG] = fragmentStart as OnPacketListener
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
@@ -131,13 +130,10 @@ class MainActivity : AppCompatActivity() {
 
         processor!!.addPacketCallback(OUTPUT_HANDEDNESS_STREAM_NAME) { packet ->
             val handedness = PacketGetter.getProtoVector(packet, LandmarkProto.Landmark.parser())
-            vmMain.handCount.postValue(handedness.size)
-            vmMain.handDetectedLastTimestamp.postValue(System.currentTimeMillis())
-            // Will be delaying resetRunnable while the progress completes
-            // otherwise if hand leaves the frame then resetRunnable will be called
-            handler.removeCallbacksAndMessages(null)
-            handler.postDelayed(resetRunnable, 1000L)
-//            log("Packet:: ${handedness.size} and ${handedness[0]}")
+
+            packetListeners.forEach { (_, v) ->
+                v.onHandednessPacket(handedness)
+            }
         }
 
         // To show verbose logging, run:
@@ -168,8 +164,8 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-    private fun exitApp() {
-        finish()
+    fun removePacketListener(tag: String) {
+        packetListeners.remove(tag)
     }
 
     @SuppressLint("SetTextI18n")
@@ -207,8 +203,10 @@ class MainActivity : AppCompatActivity() {
                 dirInt = 0
                 "NO THUMB"
             }
-
-        vmMain.updateThumbStatus(dirInt)
+        packetListeners.forEach { (_,v) ->
+            v.onLandmarkPacket(dirInt)
+        }
+//        vmMain.updateThumbStatus(dirInt)
 
 
 //        runOnUiThread {
@@ -222,39 +220,6 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-    private fun getCountDownTimer(): CountDownTimer {
-        return object : CountDownTimer(10_000L, 1000L) {
-            override fun onTick(millisUntilFinished: Long) {
-                updateCounter()
-            }
-
-            override fun onFinish() {
-                Toast.makeText(this@MainActivity, "Complete", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun updateCounter() {
-        // 0 means no thumb detected
-        if (vmMain.thumbStatus.value == 0) {
-            resetCounter()
-        } else if (vmMain.hasValueChanged.value == true) {
-            resetCounter()
-            vmMain.hasValueChanged.value = false
-        } else {
-            val lastTime = vmMain.handDetectedLastTimestamp.value
-            if (lastTime != null && System.currentTimeMillis().minus(lastTime) > 1000L)
-                resetCounter()
-            else // Proceed
-                vmMain.progressTick()
-        }
-    }
-
-    private fun resetCounter() {
-        countDownTimer?.cancel()
-        countDownTimer = null
-        vmMain.progressBar.value = 0
-    }
 
     private fun updateLabel(text: String) {
 //        runOnUiThread {

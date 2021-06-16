@@ -1,6 +1,8 @@
 package com.gesture.avius2
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -8,6 +10,10 @@ import kotlin.math.round
 
 fun log(msg: String, tag: String = "ffnet") {
     Log.i(tag, msg)
+}
+
+fun Context.toast(msg: String, len: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, msg, len).show()
 }
 
 fun getMultiHandLandmarksDebugString(multiHandLandmarks: List<LandmarkProto.NormalizedLandmarkList>): String {

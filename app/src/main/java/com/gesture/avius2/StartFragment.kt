@@ -1,30 +1,40 @@
 package com.gesture.avius2
 
-import android.os.Build
-import android.os.Bundle
+import android.os.*
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.mediapipe.formats.proto.LandmarkProto
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-class StartFragment : Fragment() {
-    private var param1: String? = null
-    private var param2: String? = null
+class StartFragment : Fragment(), OnPacketListener {
 
     private lateinit var vmStart: StartViewModel
+    private var countDownTimer: CountDownTimer? = null
+    // Callback when the thumb progress completes
+    private var onFinish: (() -> Unit)? = null
+    private lateinit var handler: Handler
+    private val resetRunnable = {
+        resetCounter()
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    companion object {
+        const val TAG = "Avius.StartFragment"
+        const val TIMER_COUNT = 3000L
+        const val TICK = 100L
+    }
+
+
+    // Make sure there are no pending callbacks, on Exit
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        // Safely Remove callbacks
+        (requireActivity() as MainActivity).removePacketListener(TAG)
+        super.onDestroy()
     }
 
     override fun onCreateView(
@@ -38,8 +48,11 @@ class StartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        handler = Handler(Looper.getMainLooper())
         vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
-
+        /**
+         * Setup Exit Dialog
+         */
         val dialogExit = CustomDialog(requireContext()).apply {
             setOnYesListener { exitApp() }
             setOnNoListener { dismiss() }
@@ -71,31 +84,67 @@ class StartFragment : Fragment() {
             } else {
                 progressBar.progress = it
             }
-            log("${vmStart.oldStatus.value} => ${vmStart.thumbStatus.value}")
         }
 
     }
 
-    companion object {
+    fun setOnFinish(callback: (() -> Unit)) { onFinish = callback }
 
-        const val TAG = "Avius.StartFragment"
-
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment StartFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            StartFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    private fun getCountDownTimer(): CountDownTimer {
+        return object : CountDownTimer(TIMER_COUNT, TICK) {
+            override fun onTick(millisUntilFinished: Long) {
+                updateCounter()
             }
+
+            override fun onFinish() {
+                onFinish?.invoke()
+            }
+        }
+    }
+
+    /**
+     * Total Progress = 300
+     * Increment = 30
+     */
+
+    private fun updateCounter() {
+        // 0 means no thumb detected
+        if (vmStart.thumbStatus.value == 0) {
+            resetCounter()
+        } else if (vmStart.hasValueChanged.value == true) {
+            resetCounter()
+            vmStart.hasValueChanged.value = false
+        } else {
+            val lastTime = vmStart.handDetectedLastTimestamp.value
+            if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK)
+                resetCounter()
+            else // Proceed
+                vmStart.progressTick()
+        }
+    }
+
+    private fun resetCounter() {
+        countDownTimer?.cancel()
+        countDownTimer = null
+        vmStart.progressBar.value = 0
+    }
+
+    private fun exitApp() {
+        requireActivity().finish()
+    }
+
+    override fun onLandmarkPacket(direction: Int) {
+        vmStart.thumbStatus.postValue(direction)
+    }
+
+    override fun onHandednessPacket(handedness: List<LandmarkProto.Landmark>) {
+
+//        vmStart.handCount.postValue(handedness.size)
+        vmStart.handDetectedLastTimestamp.postValue(System.currentTimeMillis())
+        // Will be delaying resetRunnable while the progress completes
+        // otherwise if hand leaves the frame then resetRunnable will be called
+        handler.removeCallbacksAndMessages(null)
+        handler.postDelayed(resetRunnable, 1000L)
+//            log("Packet:: ${handedness.size} and ${handedness[0]}")
     }
 }
