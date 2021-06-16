@@ -17,26 +17,10 @@ class StartViewModel: ViewModel() {
 
     val handDetectedLastTimestamp = MutableLiveData<Long>()
 
-    private lateinit var handler: Handler
 
-    private val progressRunnable = {
-        progressBar.value = progressBar.value!!.plus(1)
-        checkProgress()
-    }
-
-    private fun checkProgress() {
-        if(progressBar.value!! % 10 == 0) {
-            handler.removeCallbacksAndMessages(null)
-        } else {
-            handler.postDelayed(progressRunnable, 120L)
-        }
-    }
-
-    fun progressTick(howMuch: Int = 10) {
-//        handler = Handler(Looper.getMainLooper())
+    fun tick() {
         viewModelScope.launch {
-//            handler.postDelayed(progressRunnable, 120L)
-            progressBar.value = progressBar.value!!.plus(howMuch)
+            progressBar.value = progressBar.value!!.plus(3)
         }
     }
 
