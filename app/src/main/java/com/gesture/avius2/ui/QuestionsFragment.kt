@@ -9,14 +9,15 @@ import android.widget.ProgressBar
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
-import com.gesture.avius2.customui.GestureButton
+import com.gesture.avius2.utils.toast
+import com.gesture.avius2.viewmodels.QuestionViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.mediapipe.formats.proto.LandmarkProto
 
-class StartFragment : Fragment(), OnPacketListener {
+class QuestionsFragment : Fragment(), OnPacketListener {
 
-    private lateinit var vmStart: StartViewModel
+    private lateinit var vmStart: QuestionViewModel
     private var countDownTimer: CountDownTimer? = null
     // Callback when the thumb progress completes
     private var onFinish: (() -> Unit)? = null
@@ -26,7 +27,7 @@ class StartFragment : Fragment(), OnPacketListener {
     }
 
     companion object {
-        const val TAG = "Avius.StartFragment"
+        const val TAG = "Avius.QuestionFragment"
         const val TIMER_COUNT = 3000L
         const val TICK = 100L
     }
@@ -45,50 +46,42 @@ class StartFragment : Fragment(), OnPacketListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_start, container, false)
+        return inflater.inflate(R.layout.fragment_question, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         handler = Handler(Looper.getMainLooper())
-        vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
-        /**
-         * Setup Exit Dialog
-         */
-        val dialogExit = CustomDialog(requireContext()).apply {
-            setOnYesListener { exitApp() }
-            setOnNoListener { dismiss() }
-        }
-
-        view.findViewById<ExtendedFloatingActionButton>(R.id.fabPower).setOnClickListener {
-            dialogExit.show()
-        }
-
+        vmStart = ViewModelProvider(this).get(QuestionViewModel::class.java)
 
         /**
          * Observe Model values
          */
 
         vmStart.thumbStatus.observe(viewLifecycleOwner) {
-            if (it == 1) {
-                if (countDownTimer == null) {
-                    countDownTimer = getCountDownTimer().start()
-                }
-
+//            if (it == 1) {
+//                if (countDownTimer == null) {
+//                    countDownTimer = getCountDownTimer().start()
+//                }
+//
+//            }
+            if(it == 1) {
+                requireContext().toast("Success")
+            } else if(it == -1) {
+                requireContext().toast("OPPPSSSS")
             }
         }
 
-        val gestureButton = view.findViewById<GestureButton>(R.id.gestureButton)
-        val progressBar = gestureButton.progressBar
-
-        vmStart.progressBar.observe(viewLifecycleOwner) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                progressBar.setProgress(it, true)
-            } else {
-                progressBar.progress = it
-            }
-        }
+//        val progressBar = view.findViewById<ProgressBar>(R.id.progress)
+//
+//        vmStart.progressBar.observe(viewLifecycleOwner) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                progressBar.setProgress(it, true)
+//            } else {
+//                progressBar.progress = it
+//            }
+//        }
 
     }
 

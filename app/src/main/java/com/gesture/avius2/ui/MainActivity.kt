@@ -67,14 +67,22 @@ class MainActivity : AppCompatActivity() {
 
         vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        val fragmentStart =
-            supportFragmentManager.findFragmentByTag(StartFragment.TAG) ?: StartFragment()
+        val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
+            ?: StartFragment()) as StartFragment
         // Add listener
         packetListeners[StartFragment.TAG] = fragmentStart as OnPacketListener
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
             .commit()
+
+        fragmentStart.setOnFinish {
+            val fragmentQuestion = QuestionsFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
+                .commit()
+            packetListeners[QuestionsFragment.TAG] = fragmentQuestion as OnPacketListener
+        }
 
 //        labelText = findViewById(R.id.label)
 //        labelPoints = findViewById(R.id.points)
@@ -204,7 +212,7 @@ class MainActivity : AppCompatActivity() {
                 dirInt = 0
                 "NO THUMB"
             }
-        packetListeners.forEach { (_,v) ->
+        packetListeners.forEach { (_, v) ->
             v.onLandmarkPacket(dirInt)
         }
 //        vmMain.updateThumbStatus(dirInt)

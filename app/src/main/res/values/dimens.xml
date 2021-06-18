@@ -29,4 +29,8 @@
     <dimen name="p_thumb_up_f_start">40dp</dimen>
     <dimen name="p_thumb_up_btn">70dp</dimen>
     <dimen name="size_logo_f_question">80dp</dimen>
+    <dimen name="fab_question_size">80dp</dimen>
+    <dimen name="p_question_f_q">20dp</dimen>
+    <dimen name="thumb_padding_gesture_btn_f_question">50dp</dimen>
+    <dimen name="margin_progress_fit_f_question">-2dp</dimen>
 </resources>
