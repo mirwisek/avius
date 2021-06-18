@@ -20,37 +20,37 @@ class MainViewModel: ViewModel() {
     val hasValueChanged = MutableLiveData(false)
 
     val handDetectedLastTimestamp = MutableLiveData<Long>()
-
-    private lateinit var handler: Handler
-
-    private val progressRunnable = {
-        progressBar.value = progressBar.value!!.plus(1)
-        checkProgress()
-    }
-
-    private fun checkProgress() {
-        if(progressBar.value!! % 10 == 0) {
-            handler.removeCallbacksAndMessages(null)
-        } else {
-            handler.postDelayed(progressRunnable, 120L)
-        }
-    }
-
-    fun progressTick() {
-        handler = Handler(Looper.getMainLooper())
-        viewModelScope.launch {
-            handler.postDelayed(progressRunnable, 120L)
-        }
-    }
-
-    fun updateThumbStatus(thumbDir: Int) {
-        viewModelScope.launch {
-            // If new value is different, then store in variable so counter can reset progress
-            if(oldStatus.value != thumbDir)
-                hasValueChanged.value = true
-            oldStatus.value = thumbStatus.value
-            thumbStatus.value = thumbDir
-        }
-    }
+//
+//    private lateinit var handler: Handler
+//
+//    private val progressRunnable = {
+//        progressBar.value = progressBar.value!!.plus(1)
+//        checkProgress()
+//    }
+//
+//    private fun checkProgress() {
+//        if(progressBar.value!! % 10 == 0) {
+//            handler.removeCallbacksAndMessages(null)
+//        } else {
+//            handler.postDelayed(progressRunnable, 120L)
+//        }
+//    }
+//
+//    fun progressTick() {
+//        handler = Handler(Looper.getMainLooper())
+//        viewModelScope.launch {
+//            handler.postDelayed(progressRunnable, 120L)
+//        }
+//    }
+//
+//    fun updateThumbStatus(thumbDir: Int) {
+//        viewModelScope.launch {
+//            // If new value is different, then store in variable so counter can reset progress
+//            if(oldStatus.value != thumbDir)
+//                hasValueChanged.value = true
+//            oldStatus.value = thumbStatus.value
+//            thumbStatus.value = thumbDir
+//        }
+//    }
 
 }

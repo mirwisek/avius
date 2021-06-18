@@ -6,3 +6,4 @@ interface OnPacketListener {
     fun onLandmarkPacket(direction: Int)
     fun onHandednessPacket(list: List<LandmarkProto.Landmark>)
 }
+
