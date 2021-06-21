@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/question"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="28sp"
+    android:textColor="@color/blue_main"
+    android:textStyle="bold"
+    android:gravity="center"
+    android:paddingStart="@dimen/p_question_f_q"
+    android:paddingEnd="@dimen/p_question_f_q"
+    android:layout_marginEnd="@dimen/fab_question_size"
+    tools:text="How do you like our services?"/>

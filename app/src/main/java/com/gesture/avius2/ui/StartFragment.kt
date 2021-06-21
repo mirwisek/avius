@@ -53,6 +53,9 @@ class StartFragment : Fragment(), OnPacketListener {
 
         handler = Handler(Looper.getMainLooper())
         vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
+
+        // Start Listening to packets
+        (requireActivity() as MainActivity).setPacketListener(this, TAG)
         /**
          * Setup Exit Dialog
          */
@@ -100,9 +103,7 @@ class StartFragment : Fragment(), OnPacketListener {
                 updateCounter()
             }
 
-            override fun onFinish() {
-                onFinish?.invoke()
-            }
+            override fun onFinish() {}
         }
     }
 
@@ -112,19 +113,27 @@ class StartFragment : Fragment(), OnPacketListener {
      */
 
     private fun updateCounter() {
-        // 0 means no thumb detected
-        if (vmStart.thumbStatus.value == 0) {
-            resetCounter()
-        } else if (vmStart.hasValueChanged.value == true) {
-            resetCounter()
-            vmStart.hasValueChanged.value = false
-        } else {
-            val lastTime = vmStart.handDetectedLastTimestamp.value
-            if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK)
+        // While it is cancelable then make checks otherwise continue
+        if(vmStart.isCancelable.value!!) {
+            // 0 means no thumb detected
+            if (vmStart.thumbStatus.value == 0) {
                 resetCounter()
-            else // Proceed
+            } else if (vmStart.hasValueChanged.value == true) {
+                resetCounter()
+                vmStart.hasValueChanged.value = false
+            } else {
+                val lastTime = vmStart.handDetectedLastTimestamp.value
+                if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK)
+                    resetCounter()
+                else // Proceed
 //                vmStart.continueProgress()
-                vmStart.tick()
+                    vmStart.tick()
+            }
+        } else {
+//            vmStart.tick()
+            countDownTimer?.cancel()
+            countDownTimer = null
+            onFinish?.invoke()
         }
     }
 

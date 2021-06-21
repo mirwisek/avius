@@ -15,11 +15,17 @@ class StartViewModel: ViewModel() {
     val progressBar = MutableLiveData(0)
     val hasValueChanged = MutableLiveData(false)
 
+    // If progress exceeds beyond 80% there is no going back
+    val isCancelable = MutableLiveData(true)
+
     val handDetectedLastTimestamp = MutableLiveData<Long>()
 
 
     fun tick() {
         viewModelScope.launch {
+            if(progressBar.value!! > 25) {
+                isCancelable.value = false
+            }
             progressBar.value = progressBar.value!!.plus(3)
         }
     }

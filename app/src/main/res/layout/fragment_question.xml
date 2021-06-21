@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.Guideline
@@ -59,26 +60,29 @@
         android:textSize="30sp"
         android:textStyle="bold"
         android:textColor="@color/black"
+        android:clickable="false"
         app:layout_constraintTop_toTopOf="@id/fabQuestion"
         app:layout_constraintBottom_toBottomOf="@id/fabQuestion"
         app:layout_constraintStart_toStartOf="@id/fabQuestion"
         app:layout_constraintEnd_toEndOf="@id/fabQuestion"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpQuestion"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textColor="@color/blue_main"
-        android:textStyle="bold"
+        android:minHeight="60dp"
+        android:paddingStart="@dimen/p_question_f_q"
+        android:paddingEnd="@dimen/p_question_f_q"
         android:layout_margin="30dp"
+        app:layout_constraintVertical_bias="0.1"
         app:layout_constraintTop_toBottomOf="@id/fabQuestion"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="How do you like our services?" />
+        android:orientation="vertical" />
 
     <com.gesture.avius2.customui.GestureButton
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:id="@+id/btnThumbsUp"
         app:layoutPadding="5dp"
         app:marginProgressFit="@dimen/margin_progress_fit_f_question"
@@ -89,8 +93,8 @@
         app:layout_constraintBottom_toTopOf="@id/logo" />
 
     <com.gesture.avius2.customui.GestureButton
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:id="@+id/btnThumbsDown"
         app:layoutPadding="5dp"
         app:marginProgressFit="@dimen/margin_progress_fit_f_question"
