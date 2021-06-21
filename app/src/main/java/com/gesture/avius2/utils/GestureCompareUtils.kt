@@ -12,17 +12,17 @@ object GestureCompareUtils {
     const val MCP = 4
     const val THUMB_LINE = 5
 
-    fun getVerticalDirection(nList: List<LandmarkProto.NormalizedLandmark>): String {
+    fun getVerticalDirection(nList: List<LandmarkProto.NormalizedLandmark>): Int {
         return if(nList[4].y < nList[0].y) {
-            "UP"
+            1 // "UP"
         } else {
-            "DN"
+            -1 // "DN"
         }
     }
 
 }
 
-fun List<LandmarkProto.NormalizedLandmark>.getPoints(which: Int, decimalPlace:Int = 1): List<Point> {
+fun List<LandmarkProto.NormalizedLandmark>.getPoints(which: Int, decimalPlace:Int = 2): List<Point> {
     val list = when(which) {
         // 8,12,16,20
         GestureCompareUtils.TIP -> listOf(
@@ -48,7 +48,7 @@ fun List<LandmarkProto.NormalizedLandmark>.getPoints(which: Int, decimalPlace:In
         else -> listOf(get(0))
     }
     return list.map {
-        Point(it.x.roundTo(decimalPlace), it.y.roundTo(decimalPlace), it.z.roundTo(decimalPlace))
+        Point(it.x.times(100).roundTo(decimalPlace), it.y.times(100).roundTo(decimalPlace), it.z.times(100).roundTo(decimalPlace))
     }
 }
 
@@ -57,6 +57,21 @@ fun List<Point>.areParallel(threshold: Float = 0.1F, isX: Boolean = true): Boole
     val minTip = minOf { if (isX) it.x else it.y }
     val diffTip = abs(maxTip - minTip)
     return diffTip <= threshold
+}
+
+/**
+ * Used for list to be zipped with another list to compare adjacent points lying between certain threshold
+ * @param threshold is the amount of distance allowed between two points
+ * @return If all the points are adjacent under specified threshold
+ */
+fun List<Pair<Point, Point>>.areAdjacentParallelX(thresholdRange: ClosedFloatingPointRange<Float>): Boolean {
+    forEach { item ->
+        val diff = abs(item.first.x - item.second.x)
+        // The lower range is to avoid outliers or no hands detected at all
+        if(diff !in thresholdRange)
+            return false
+    }
+    return true
 }
 
 fun List<Point>.strLine(which: Int): String {

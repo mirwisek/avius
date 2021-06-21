@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.Guideline
@@ -45,6 +46,7 @@
         app:backgroundTint="@color/white"
         android:textSize="30sp"
         android:textAlignment="center"
+        android:clickable="false"
         android:gravity="center"
         app:iconTint="@color/teal_light"
         app:collapsedSize="@dimen/fab_size_f_start"
@@ -66,23 +68,37 @@
         app:layout_constraintStart_toStartOf="@id/fabQuestion"
         app:layout_constraintEnd_toEndOf="@id/fabQuestion"/>
 
-    <TextView
-        android:id="@+id/question"
-        android:layout_width="wrap_content"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpQuestion"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="28sp"
-        android:textColor="@color/blue_main"
-        android:textStyle="bold"
-        android:gravity="center"
+        android:minHeight="60dp"
         android:paddingStart="@dimen/p_question_f_q"
         android:paddingEnd="@dimen/p_question_f_q"
         android:layout_marginEnd="@dimen/fab_question_size"
         app:layout_constraintVertical_bias="0.1"
         app:layout_constraintTop_toTopOf="@id/fabQuestion"
-        app:layout_constraintBottom_toBottomOf="@id/fabQuestion"
         app:layout_constraintStart_toEndOf="@id/fabQuestion"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="How do you like our services?" />
+        android:orientation="vertical" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/question"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textSize="28sp"-->
+<!--        android:textColor="@color/blue_main"-->
+<!--        android:textStyle="bold"-->
+<!--        android:gravity="center"-->
+<!--        android:paddingStart="@dimen/p_question_f_q"-->
+<!--        android:paddingEnd="@dimen/p_question_f_q"-->
+<!--        android:layout_marginEnd="@dimen/fab_question_size"-->
+<!--        app:layout_constraintVertical_bias="0.1"-->
+<!--        app:layout_constraintTop_toTopOf="@id/fabQuestion"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/fabQuestion"-->
+<!--        app:layout_constraintStart_toEndOf="@id/fabQuestion"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:text="How do you like our services?" />-->
 
     <com.gesture.avius2.customui.GestureButton
         android:layout_width="340dp"

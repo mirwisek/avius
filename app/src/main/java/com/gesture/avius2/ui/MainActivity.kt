@@ -13,11 +13,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.utils.GestureCompareUtils
 import com.gesture.avius2.utils.areParallel
 import com.gesture.avius2.utils.getPoints
+import com.gesture.avius2.utils.log
 import com.gesture.avius2.viewmodels.MainViewModel
 import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
@@ -69,10 +71,12 @@ class MainActivity : AppCompatActivity() {
 
         val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
             ?: StartFragment()) as StartFragment
-        // Add listener
-        packetListeners[StartFragment.TAG] = fragmentStart as OnPacketListener
+
+        //TODO: Remove this val, for debug only
+//        val fragmentQuestion = QuestionsFragment()
 
         supportFragmentManager.beginTransaction()
+//            .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
             .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
             .commit()
 
@@ -81,11 +85,10 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
                 .commit()
-            packetListeners[QuestionsFragment.TAG] = fragmentQuestion as OnPacketListener
         }
 
-//        labelText = findViewById(R.id.label)
-//        labelPoints = findViewById(R.id.points)
+        labelText = findViewById(R.id.label)
+        labelPoints = findViewById(R.id.points)
 //
 //        vmMain.label.observe(this) { value ->
 //            if(value == null) {
@@ -150,14 +153,23 @@ class MainActivity : AppCompatActivity() {
         processor!!.addPacketCallback(
             OUTPUT_LANDMARKS_STREAM_NAME
         ) { packet: Packet ->
+
             updateLabel("")
-            Log.v(TAG, "Received multi-hand landmarks packet.")
+
             val multiHandLandmarks =
                 PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
 
             for (l in multiHandLandmarks) {
                 val list = l.landmarkList
-                printPoints(list)
+//                LandmarkProcessor.process(list, packetListeners)
+                val str = LandmarkProcessor.process2(list) { direction ->
+                    packetListeners.forEach {
+                        it.value.onLandmarkPacket(direction)
+                    }
+                }
+                runOnUiThread {
+                    labelPoints.text = str
+                }
             }
 //            Log.v(
 //                TAG,
@@ -173,61 +185,18 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
+    /**
+     * When fragment is ready it will make a call to activity to listener for packets
+     * after it has initialized all variables
+     */
+    fun setPacketListener(fragment: Fragment, tag: String) {
+        packetListeners[tag] = fragment as OnPacketListener
+    }
+
     fun removePacketListener(tag: String) {
         packetListeners.remove(tag)
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun printPoints(nList: List<LandmarkProto.NormalizedLandmark>) {
-
-        val dir = GestureCompareUtils.getVerticalDirection(nList)
-
-        val tip = nList.getPoints(GestureCompareUtils.TIP)
-        val dip = nList.getPoints(GestureCompareUtils.DIP)
-        val pip = nList.getPoints(GestureCompareUtils.PIP)
-        val mcp = nList.getPoints(GestureCompareUtils.MCP)
-        val thumbLine = nList.getPoints(GestureCompareUtils.THUMB_LINE)
-
-//        log("Tip size is ${tip.strLine(GestureCompareUtils.TIP) }")
-
-//        val isTip = tip.areParallel()
-//        val isDip = dip.areParallel()
-//        val isPip = pip.areParallel()
-//        val isMcp = mcp.areParallel()
-        val isThumbTIP = (thumbLine + tip).areParallel(0.2F)
-        val isThumbDIP = (thumbLine + dip).areParallel(0.2F)
-        val isThumbPIP = (thumbLine + pip).areParallel(0.2F)
-        val isThumbMCP = (thumbLine + mcp).areParallel(0.2F)
-
-        var dirInt = 0
-
-        // For label print purposes only
-        val m =
-            if (isThumbMCP) "mcp" else if (isThumbDIP) "dip" else if (isThumbPIP) "pip" else "tip"
-        val res =
-            if (/*isTip && isDip && isPip && isMcp*/isThumbMCP || isThumbPIP || isThumbDIP || isThumbTIP) {
-                dirInt = if (dir == "UP") 1 else -1
-                "THUMB $dir" /*+ "($m)"*/
-            } else {
-                dirInt = 0
-                "NO THUMB"
-            }
-        packetListeners.forEach { (_, v) ->
-            v.onLandmarkPacket(dirInt)
-        }
-//        vmMain.updateThumbStatus(dirInt)
-
-
-//        runOnUiThread {
-
-//            labelPoints.text = res + "\n"
-
-//                tip.strLine(GestureCompareUtils.TIP) + "\n\n" +
-//                dip.strLine(GestureCompareUtils.DIP) + "\n\n" +
-//                pip.strLine(GestureCompareUtils.PIP) + "\n\n" +
-//                mcp.strLine(GestureCompareUtils.MCP)
-//        }
-    }
 
 
     private fun updateLabel(text: String) {
