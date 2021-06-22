@@ -5,64 +5,10 @@
     app:cardCornerRadius="20dp"
     android:layout_margin="10dp"
     android:background="#00000000"
+    android:id="@+id/cardParentDialog"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="30dp" >
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fabPower"
-            app:backgroundTint="@color/white"
-            app:icon="@drawable/ic_power"
-            app:iconTint="@color/teal_light"
-            app:iconSize="@dimen/dialog_icon_size"
-            app:collapsedSize="@dimen/dialog_fab_size"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <TextView
-            android:id="@+id/msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/fabPower"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="30dp"
-            android:textSize="@dimen/dialog_msg_size"
-            android:textColor="@color/teal_light"
-            android:text="Are you sure you want to log out?" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="No"
-            android:minWidth="100dp"
-            android:layout_marginTop="20dp"
-            app:strokeColor="@color/red"
-            android:textColor="@color/red"
-            app:layout_constraintTop_toBottomOf="@id/msg"
-            app:layout_constraintStart_toStartOf="@id/msg"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_yes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="Yes"
-            android:minWidth="100dp"
-            android:layout_marginTop="20dp"
-            app:strokeColor="@color/black"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/msg"
-            app:layout_constraintEnd_toEndOf="@id/msg"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Add views on runtime -->
+<!--    <include layout="@layout/layout_dialog_logout" />-->
 
 </com.google.android.material.card.MaterialCardView>

@@ -2,6 +2,7 @@ package com.gesture.avius2.utils
 
 import android.content.Context
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
@@ -41,4 +42,16 @@ fun Double.roundTo(decimals: Int, roundingMode: RoundingMode = RoundingMode.CEIL
 
 fun Float.roundTo(decimals: Int, roundingMode: RoundingMode = RoundingMode.CEILING): Float {
     return toDouble().roundTo(decimals, roundingMode).toFloat()
+}
+
+fun View.visible() {
+    visibility = View.VISIBLE
+}
+
+fun View.invisible() {
+    visibility = View.INVISIBLE
+}
+
+fun View.gone() {
+    visibility = View.GONE
 }

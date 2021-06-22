@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.Guideline
@@ -82,47 +83,41 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:orientation="vertical" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/question"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textSize="28sp"-->
-<!--        android:textColor="@color/blue_main"-->
-<!--        android:textStyle="bold"-->
-<!--        android:gravity="center"-->
-<!--        android:paddingStart="@dimen/p_question_f_q"-->
-<!--        android:paddingEnd="@dimen/p_question_f_q"-->
-<!--        android:layout_marginEnd="@dimen/fab_question_size"-->
-<!--        app:layout_constraintVertical_bias="0.1"-->
-<!--        app:layout_constraintTop_toTopOf="@id/fabQuestion"-->
-<!--        app:layout_constraintBottom_toBottomOf="@id/fabQuestion"-->
-<!--        app:layout_constraintStart_toEndOf="@id/fabQuestion"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        android:text="How do you like our services?" />-->
-
     <com.gesture.avius2.customui.GestureButton
-        android:layout_width="340dp"
-        android:layout_height="340dp"
         android:id="@+id/btnThumbsUp"
-        app:layoutPadding="25dp"
-        app:marginProgressFit="@dimen/margin_progress_fit_f_question"
-        app:thumbPadding="@dimen/thumb_padding_gesture_btn_f_question"
         app:thumbDrawable="@drawable/ic_thumb_up"
+        style="@style/FragmentQuestionGestureButton"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/gStart"
         app:layout_constraintTop_toBottomOf="@id/fabQuestion"
-        app:layout_constraintBottom_toTopOf="@id/logo" />
+        app:layout_constraintBottom_toTopOf="@id/thumbUpLabel" />
+
+    <TextView
+        android:id="@+id/thumbUpLabel"
+        tools:text="GOOD"
+        style="@style/GestureButtonLabel"
+        app:layout_constraintTop_toBottomOf="@id/btnThumbsUp"
+        app:layout_constraintStart_toStartOf="@id/btnThumbsUp"
+        app:layout_constraintEnd_toEndOf="@id/btnThumbsUp"
+        app:layout_constraintBottom_toTopOf="@id/logo"/>
 
     <com.gesture.avius2.customui.GestureButton
-        android:layout_width="340dp"
-        android:layout_height="340dp"
         android:id="@+id/btnThumbsDown"
-        app:layoutPadding="25dp"
-        app:marginProgressFit="@dimen/margin_progress_fit_f_question"
-        app:thumbPadding="@dimen/thumb_padding_gesture_btn_f_question"
+        style="@style/FragmentQuestionGestureButton"
         app:thumbDrawable="@drawable/ic_thumbs_down"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintEnd_toEndOf="@id/gEnd"
         app:layout_constraintTop_toBottomOf="@id/fabQuestion"
-        app:layout_constraintBottom_toTopOf="@id/logo" />
+        app:layout_constraintBottom_toTopOf="@id/thumbDownLabel" />
+
+    <TextView
+        android:id="@+id/thumbDownLabel"
+        tools:text="BAD"
+        style="@style/GestureButtonLabel"
+        app:layout_constraintTop_toBottomOf="@id/btnThumbsDown"
+        app:layout_constraintStart_toStartOf="@id/btnThumbsDown"
+        app:layout_constraintEnd_toEndOf="@id/btnThumbsDown"
+        app:layout_constraintBottom_toTopOf="@id/logo"/>
 
     <ImageView
         android:id="@+id/logo"

@@ -1,19 +1,23 @@
 package com.gesture.avius2.ui
 
 import android.os.*
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.viewmodels.StartViewModel
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.mediapipe.formats.proto.LandmarkProto
 
+/**
+ * Don't confuse with StartActivity, StartFragment is for starting the thumb detection and
+ * first step for moving towards question survey
+ */
 class StartFragment : Fragment(), OnPacketListener {
 
     private lateinit var vmStart: StartViewModel
@@ -59,15 +63,20 @@ class StartFragment : Fragment(), OnPacketListener {
         /**
          * Setup Exit Dialog
          */
-        val dialogExit = CustomDialog(requireContext()).apply {
-            setOnYesListener { exitApp() }
-            setOnNoListener { dismiss() }
+        val dialogExit = CustomDialog(requireContext()) { parent, dialog ->
+            val v = layoutInflater.inflate(R.layout.layout_dialog_logout, parent)
+
+            v.findViewById<MaterialButton>(R.id.btn_yes).setOnClickListener {
+                exitApp()
+            }
+            v.findViewById<MaterialButton>(R.id.btn_no).setOnClickListener {
+                dialog.dismiss()
+            }
         }
 
         view.findViewById<ExtendedFloatingActionButton>(R.id.fabPower).setOnClickListener {
             dialogExit.show()
         }
-
 
         /**
          * Observe Model values
@@ -123,10 +132,11 @@ class StartFragment : Fragment(), OnPacketListener {
                 vmStart.hasValueChanged.value = false
             } else {
                 val lastTime = vmStart.handDetectedLastTimestamp.value
-                if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK)
+                // When the last frame that detected hand, was twice the tick rate then reset
+                // When it is single TICK then it undos TOO OFTEN
+                if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK * 2)
                     resetCounter()
                 else // Proceed
-//                vmStart.continueProgress()
                     vmStart.tick()
             }
         } else {
