@@ -15,6 +15,10 @@
         <item name="android:insetRight">0dp</item>
     </style>
 
+    <style name="SubmitButton" parent="HappyButton">
+        <item name="backgroundTint">@color/teal_light</item>
+    </style>
+
     <style name="FragmentQuestionGestureButton">
         <item name="android:layout_width">160dp</item>
         <item name="android:layout_height">160dp</item>

@@ -88,9 +88,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             it?.let { question ->
                 questionStat.text = "${question.index}/${fragments.size}"
                 updateQuestionProgress(question.index)
-                log("Question is $it")
-                tvThumbUp.text = question.upAnswers.english
-                tvThumbDown.text = question.downAnswers.english
+                tvThumbUp.text = question.upAnswers
+                tvThumbDown.text = question.downAnswers
             }
         }
 
@@ -192,7 +191,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     private fun saveAnswer(direction: Int) {
         val q = vmQuestions.currentQuestion.value!!
         val ans = if(direction == 1) q.upAnswers else q.downAnswers
-        vmQuestions.currentQuestion.value!!.answer = ans.english
+        vmQuestions.currentQuestion.value!!.answer = ans
     }
 
     private fun nextQuestion() {
