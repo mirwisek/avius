@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                 val v = layoutInflater.inflate(R.layout.layout_dialog_loading, parent)
                 v.findViewById<ProgressBar>(R.id.progress).gone()
                 v.findViewById<TextView>(R.id.msg).text =
-                    "Your device doesn't support running this App"
+                    "Sorry! Your device doesn't support running this App"
                 parent.setOnClickListener {
                     dialog.dismiss()
                 }
