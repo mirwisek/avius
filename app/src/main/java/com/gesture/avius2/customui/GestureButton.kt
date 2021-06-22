@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.core.view.marginBottom
 import androidx.core.view.setPadding
 import com.gesture.avius2.R
 import com.google.android.material.circularreveal.CircularRevealRelativeLayout
@@ -25,6 +26,7 @@ constructor(private val ctx: Context, private val attrs: AttributeSet? = null) :
         val circle = root.findViewById<ImageView>(R.id.circle)
 
         progressBar = root.findViewById(R.id.progress)
+        val progressMarginBottom = progressBar.marginBottom
 
         val res = ctx.obtainStyledAttributes(attrs, R.styleable.GestureButton, 0, 0)
         try {
@@ -36,10 +38,20 @@ constructor(private val ctx: Context, private val attrs: AttributeSet? = null) :
             val padding = res.getDimensionPixelSize(R.styleable.GestureButton_layoutPadding, 0)
             container.setPadding(padding, padding, padding, padding)
 
-            val marginProgress = res.getDimensionPixelSize(R.styleable.GestureButton_marginProgressFit, 0)
+            val marginCircle = res.getDimensionPixelSize(R.styleable.GestureButton_marginCircle, 0)
             val circleParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            circleParams.setMargins(marginProgress,marginProgress,marginProgress,marginProgress)
+            circleParams.setMargins(marginCircle,marginCircle,marginCircle,marginCircle)
             circle.layoutParams = circleParams
+
+            val marginProgress = res.getDimensionPixelSize(R.styleable.GestureButton_marginProgress, 0)
+            val progressParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            progressParams.setMargins(
+                 marginProgress
+                ,marginProgress
+                ,marginProgress
+                ,marginProgress + progressMarginBottom
+            )
+            progressBar.layoutParams = progressParams
         } finally {
             res.recycle()
         }

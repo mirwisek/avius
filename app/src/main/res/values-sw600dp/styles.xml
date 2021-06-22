@@ -4,7 +4,8 @@
         <item name="android:layout_width">340dp</item>
         <item name="android:layout_height">340dp</item>
         <item name="layoutPadding">25dp</item>
-        <item name="marginProgressFit">@dimen/margin_progress_fit_f_question</item>
+        <item name="marginCircle">@dimen/margin_circle_f_question</item>
+        <item name="marginProgress">1dp</item>
         <item name="thumbPadding">@dimen/thumb_padding_gesture_btn_f_question</item>
     </style>
 

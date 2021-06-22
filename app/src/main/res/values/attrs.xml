@@ -3,7 +3,8 @@
     <declare-styleable name="GestureButton">
         <attr name="thumbDrawable" format="reference" />
         <attr name="layoutPadding" format="dimension" />
-        <attr name="marginProgressFit" format="dimension" />
+        <attr name="marginProgress" format="dimension" />
+        <attr name="marginCircle" format="dimension" />
         <attr name="thumbPadding" format="dimension" />
 <!--        <attr name="calendar" format="enum">-->
 <!--            <enum name="jalali" value="0" />-->
