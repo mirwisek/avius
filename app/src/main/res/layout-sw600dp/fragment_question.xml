@@ -94,7 +94,7 @@
 
     <TextView
         android:id="@+id/thumbUpLabel"
-        tools:text="GOOD"
+        tools:text="Good - جيد"
         style="@style/GestureButtonLabel"
         app:layout_constraintTop_toBottomOf="@id/btnThumbsUp"
         app:layout_constraintStart_toStartOf="@id/btnThumbsUp"
@@ -112,7 +112,7 @@
 
     <TextView
         android:id="@+id/thumbDownLabel"
-        tools:text="BAD"
+        tools:text="Bad - سئ"
         style="@style/GestureButtonLabel"
         app:layout_constraintTop_toBottomOf="@id/btnThumbsDown"
         app:layout_constraintStart_toStartOf="@id/btnThumbsDown"

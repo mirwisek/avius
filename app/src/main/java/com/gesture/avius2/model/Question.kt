@@ -4,20 +4,22 @@ data class Question(
     val index: Int,
     var id: Int,
     var question: QuestionMultiLang,
-    var upAnswers: LanguageAnswer,
-    var downAnswers: LanguageAnswer,
+    var upAnswers: String,
+    var downAnswers: String,
     var answer: String = ""
 )
 
 data class Answers(
-    var upAnswer: LanguageAnswer = LanguageAnswer(),
-    var downAnswer: LanguageAnswer = LanguageAnswer()
+    var upAnswer: String = "",
+    var downAnswer: String = ""
 ) {
     companion object {
         fun parse(value: String): Answers {
             val arr = value.split(",")
-            val up = LanguageAnswer.parse(arr[0])
-            val down = LanguageAnswer.parse(arr[1])
+//            val up = LanguageAnswer.parse(arr[0])
+//            val down = LanguageAnswer.parse(arr[1])
+            val up = arr[0]
+            val down = arr[1]
             return Answers(up, down)
         }
     }

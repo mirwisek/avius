@@ -101,7 +101,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textLayoutPointID"
                 android:textAllCaps="false"
-                style="@style/HappyButton"
+                style="@style/SubmitButton"
                 android:layout_marginTop="@dimen/mt_point_id"
                 android:textSize="20sp"
                 android:text="Submit"/>

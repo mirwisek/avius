@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include layout="@layout/error_card"
-        android:visibility="visible"/>
+        android:visibility="invisible"/>
 
     <com.google.android.material.circularreveal.cardview.CircularRevealCardView
         android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textLayoutPointID"
                 android:textAllCaps="false"
-                style="@style/HappyButton"
+                style="@style/SubmitButton"
                 android:layout_marginTop="@dimen/mt_point_id"
                 android:textSize="20sp"
                 android:text="Submit"/>
