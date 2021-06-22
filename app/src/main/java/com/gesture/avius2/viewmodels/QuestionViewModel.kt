@@ -9,7 +9,7 @@ import com.gesture.avius2.model.QuestionMultiLang
 import com.gesture.avius2.utils.log
 import kotlinx.coroutines.launch
 
-class QuestionViewModel(app: Application) : AndroidViewModel(app) {
+class QuestionViewModel(val app: Application) : AndroidViewModel(app) {
 
     private val repository = (app as App).repository
     private val repoQuestions = MutableLiveData(repository.questions?.point?.form?.questions)
@@ -24,6 +24,16 @@ class QuestionViewModel(app: Application) : AndroidViewModel(app) {
             list.add(Question(index++, it.id, q, ans.upAnswer, ans.downAnswer))
         }
         list
+    }
+
+    fun saveAnswer(index: Int, answer: String) {
+        questions.value?.getOrNull(index)?.answer = answer
+    }
+
+    fun storeAnswers() {
+        questions.value!!.let {
+            repository.answers = it
+        }
     }
 
     val currentQuestion = MutableLiveData<Question>()

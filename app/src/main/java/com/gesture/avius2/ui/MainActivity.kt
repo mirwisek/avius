@@ -11,15 +11,14 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
-import com.gesture.avius2.utils.GestureCompareUtils
-import com.gesture.avius2.utils.areParallel
-import com.gesture.avius2.utils.getPoints
-import com.gesture.avius2.utils.log
+import com.gesture.avius2.customui.CustomDialog
+import com.gesture.avius2.utils.*
 import com.gesture.avius2.viewmodels.MainViewModel
 import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
@@ -65,124 +64,128 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
+        if (wasAbleToLoadLibrary) {
 
-        val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
-            ?: StartFragment()) as StartFragment
+            setContentView(R.layout.activity_main)
+            vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        //TODO: Remove this val, for debug only
+            val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
+                ?: StartFragment()) as StartFragment
+
+            //TODO: Remove this val, for debug only
 //        val fragmentQuestion = QuestionsFragment()
 
-        supportFragmentManager.beginTransaction()
-//            .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
-            .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
-            .commit()
-
-        fragmentStart.setOnFinish {
-            val fragmentQuestion = QuestionsFragment()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
+//            .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
+                .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
                 .commit()
-        }
 
-        labelText = findViewById(R.id.label)
-        labelPoints = findViewById(R.id.points)
-//
-//        vmMain.label.observe(this) { value ->
-//            if(value == null) {
-//                updateLabel("")
-//            } else {
-//                updateLabel(value)
-//            }
-//        }
-//
-//        vmMain.handCount.observe(this) { value ->
-//            if(value != null && value > 0) {
-//                updateLabel(vmMain.label.value ?: "")
-//            } else {
-//                updateLabel("")
-//            }
-//        }
+            val fragmentQuestion = QuestionsFragment()
 
-        try {
-            appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(TAG, "Cannot find application info: $e")
-        }
-
-
-        previewDisplayView = SurfaceView(this)
-        setupPreviewDisplayView()
-
-
-        // Initialize asset manager so that MediaPipe native libraries can access the app assets, e.g.,
-        // binary graphs.
-        AndroidAssetUtil.initializeNativeAssetManager(this)
-        eglManager = EglManager(null)
-
-        processor = FrameProcessor(
-            this,
-            eglManager!!.nativeContext,
-            BINARY_GRAPH_NAME,
-            INPUT_VIDEO_STREAM_NAME,
-            OUTPUT_VIDEO_STREAM_NAME
-        )
-
-        processor!!.videoSurfaceOutput
-            .setFlipY(FLIP_FRAMES_VERTICALLY)
-
-
-        PermissionHelper.checkAndRequestCameraPermissions(this)
-        val packetCreator = processor!!.packetCreator
-        val inputSidePackets: MutableMap<String, Packet> = HashMap()
-        inputSidePackets[INPUT_NUM_HANDS_SIDE_PACKET_NAME] = packetCreator.createInt32(NUM_HANDS)
-        processor!!.setInputSidePackets(inputSidePackets)
-
-        processor!!.addPacketCallback(OUTPUT_HANDEDNESS_STREAM_NAME) { packet ->
-            val handedness = PacketGetter.getProtoVector(packet, LandmarkProto.Landmark.parser())
-
-            packetListeners.forEach { (_, v) ->
-                v.onHandednessPacket(handedness)
+            fragmentStart.setOnFinish {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
+                    .commit()
             }
-        }
 
-        // To show verbose logging, run:
-        // adb shell setprop log.tag.MainActivity VERBOSE
-        processor!!.addPacketCallback(
-            OUTPUT_LANDMARKS_STREAM_NAME
-        ) { packet: Packet ->
+            fragmentQuestion.setOnSurveyComplete { themeColor ->
+                val fragmentSubscription = SubscriptionFragment.newInstance(themeColor)
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.fragment_container,
+                        fragmentSubscription,
+                        SubscriptionFragment.TAG
+                    )
+                    .commit()
+            }
 
-            updateLabel("")
+            labelText = findViewById(R.id.label)
+            labelPoints = findViewById(R.id.points)
 
-            val multiHandLandmarks =
-                PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
+            try {
+                appInfo =
+                    packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.e(TAG, "Cannot find application info: $e")
+            }
 
-            for (l in multiHandLandmarks) {
-                val list = l.landmarkList
+            previewDisplayView = SurfaceView(this)
+            setupPreviewDisplayView()
+
+            // Initialize asset manager so that MediaPipe native libraries can access the app assets, e.g.,
+            // binary graphs.
+            AndroidAssetUtil.initializeNativeAssetManager(this)
+            eglManager = EglManager(null)
+
+            processor = FrameProcessor(
+                this,
+                eglManager!!.nativeContext,
+                BINARY_GRAPH_NAME,
+                INPUT_VIDEO_STREAM_NAME,
+                OUTPUT_VIDEO_STREAM_NAME
+            )
+
+            processor!!.videoSurfaceOutput
+                .setFlipY(FLIP_FRAMES_VERTICALLY)
+
+
+            PermissionHelper.checkAndRequestCameraPermissions(this)
+            val packetCreator = processor!!.packetCreator
+            val inputSidePackets: MutableMap<String, Packet> = HashMap()
+            inputSidePackets[INPUT_NUM_HANDS_SIDE_PACKET_NAME] =
+                packetCreator.createInt32(NUM_HANDS)
+            processor!!.setInputSidePackets(inputSidePackets)
+
+            processor!!.addPacketCallback(OUTPUT_HANDEDNESS_STREAM_NAME) { packet ->
+                val handedness =
+                    PacketGetter.getProtoVector(packet, LandmarkProto.Landmark.parser())
+
+                packetListeners.forEach { (_, v) ->
+                    v.onHandednessPacket(handedness)
+                }
+            }
+
+            // To show verbose logging, run:
+            // adb shell setprop log.tag.MainActivity VERBOSE
+            processor!!.addPacketCallback(
+                OUTPUT_LANDMARKS_STREAM_NAME
+            ) { packet: Packet ->
+
+                updateLabel("")
+
+                val multiHandLandmarks =
+                    PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
+
+                for (l in multiHandLandmarks) {
+                    val list = l.landmarkList
 //                LandmarkProcessor.process(list, packetListeners)
-                val str = LandmarkProcessor.process2(list) { direction ->
-                    packetListeners.forEach {
-                        it.value.onLandmarkPacket(direction)
+                    val str = LandmarkProcessor.process2(list) { direction ->
+                        packetListeners.forEach {
+                            it.value.onLandmarkPacket(direction)
+                        }
+                    }
+                    runOnUiThread {
+                        labelPoints.text = str
                     }
                 }
-                runOnUiThread {
-                    labelPoints.text = str
-                }
-            }
-//            Log.v(
-//                TAG,
-//                "[TS:"
-//                        + packet.timestamp
-//                        + "] "
-//                        + getMultiHandLandmarksDebugString(multiHandLandmarks))
 
+            }
+        } else {
+            CustomDialog(this) { parent, dialog ->
+                val v = layoutInflater.inflate(R.layout.layout_dialog_loading, parent)
+                v.findViewById<ProgressBar>(R.id.progress).gone()
+                v.findViewById<TextView>(R.id.msg).text =
+                    "Your device doesn't support running this App"
+                parent.setOnClickListener {
+                    dialog.dismiss()
+                }
+                dialog.setOnDismissListener {
+                    finish()
+                }
+            }.show()
         }
 
-//        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-//
-//        }
     }
 
     /**
@@ -197,7 +200,9 @@ class MainActivity : AppCompatActivity() {
         packetListeners.remove(tag)
     }
 
+    fun onSurveyComplete() {
 
+    }
 
     private fun updateLabel(text: String) {
 //        runOnUiThread {
@@ -209,21 +214,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        converter = ExternalTextureConverter(
-            eglManager!!.context, 2
-        )
-        converter!!.setFlipY(FLIP_FRAMES_VERTICALLY)
-        converter!!.setConsumer(processor)
-        if (PermissionHelper.cameraPermissionsGranted(this)) {
-            startCamera()
+        if (wasAbleToLoadLibrary) {
+            converter = ExternalTextureConverter(
+                eglManager!!.context, 2
+            )
+            converter!!.setFlipY(FLIP_FRAMES_VERTICALLY)
+            converter!!.setConsumer(processor)
+            if (PermissionHelper.cameraPermissionsGranted(this)) {
+                startCamera()
+            }
         }
     }
 
     override fun onPause() {
         super.onPause()
-        converter!!.close()
-        // Hide preview display until we re-open the camera again.
-        previewDisplayView!!.visibility = View.GONE
+        if (wasAbleToLoadLibrary) {
+            converter!!.close()
+            // Hide preview display until we re-open the camera again.
+            previewDisplayView!!.visibility = View.GONE
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -309,10 +318,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+
+        private var wasAbleToLoadLibrary = true
+
         init {
             // Load all native libraries needed by the app.
-            System.loadLibrary("mediapipe_jni")
-            System.loadLibrary("opencv_java3")
+            try {
+                System.loadLibrary("mediapipe_jni")
+                System.loadLibrary("opencv_java3")
+            } catch (e: UnsatisfiedLinkError) {
+                log("Error $e")
+                wasAbleToLoadLibrary = false
+            }
         }
 
         private const val TAG = "MainActivity"

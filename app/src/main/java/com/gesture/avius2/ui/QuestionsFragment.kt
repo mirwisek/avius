@@ -27,6 +27,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     private lateinit var tvThumbUp: TextView
     private lateinit var tvThumbDown: TextView
 
+    private var onSurveyDone: ((themeColor: Int) -> Unit)? = null
+
     private lateinit var vmQuestions: QuestionViewModel
     private var countDownTimer: CountDownTimer? = null
     private lateinit var handler: Handler
@@ -150,10 +152,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
     }
 
-    // Reset values in ViewModel for new question
-    private fun resetViewModel() {
-
-    }
+    fun setOnSurveyComplete(callback: ((themeColor: Int) -> Unit)) { onSurveyDone = callback }
 
     private fun updateQuestionProgress(value: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -205,7 +204,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     private fun saveAnswer(direction: Int) {
         val q = vmQuestions.currentQuestion.value!!
         val ans = if(direction == 1) q.upAnswers else q.downAnswers
-        vmQuestions.currentQuestion.value!!.answer = ans
+        vmQuestions.saveAnswer(q.index - 1, ans)
     }
 
     private fun nextQuestion() {
@@ -219,7 +218,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
                 shouldTakeInput = true
             }, NEXT_QUESTION_DELAY)
         } else {
-            exitApp()
+            vmQuestions.storeAnswers()  // Save ViewModel answers into App's Repository Cache
+            onSurveyDone?.invoke(themeColor)
         }
     }
 
@@ -228,10 +228,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         countDownTimer = null
         vmQuestions.progressBarUp.value = 0
         vmQuestions.progressBarDown.value = 0
-    }
-
-    private fun exitApp() {
-        requireActivity().finish()
     }
 
     override fun onLandmarkPacket(direction: Int) {

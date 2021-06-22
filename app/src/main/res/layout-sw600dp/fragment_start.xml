@@ -76,31 +76,5 @@
         app:layout_constraintTop_toTopOf="@id/gTop"
         app:layout_constraintBottom_toBottomOf="@id/gBottom"/>
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="@dimen/size_logo_f_start"
-        android:layout_height="@dimen/size_logo_f_start"
-        android:src="@drawable/logo"
-        android:maxHeight="@dimen/logo_max_height"
-        android:maxWidth="@dimen/logo_max_width"
-        android:minWidth="@dimen/logo_min_width"
-        android:minHeight="@dimen/logo_min_height"
-        android:layout_margin="@dimen/m_logo_f_start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <ImageView
-        android:id="@+id/companyLogo"
-        android:layout_width="@dimen/size_logo_f_start"
-        android:layout_height="@dimen/size_logo_f_start"
-        android:src="@drawable/ic_company_logo"
-        android:maxHeight="@dimen/logo_max_height"
-        android:maxWidth="@dimen/logo_max_width"
-        android:minWidth="@dimen/logo_min_width"
-        android:minHeight="@dimen/logo_min_height"
-        android:layout_margin="@dimen/m_logo_f_start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
