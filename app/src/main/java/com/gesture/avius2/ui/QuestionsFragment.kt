@@ -73,8 +73,13 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
         val fragments = arrayListOf<QuestionHolderFragment>()
         vmQuestions.questions.observe(viewLifecycleOwner) {
-            it?.forEach { item ->
-                fragments.add(QuestionHolderFragment.newInstance(item.question))
+            it?.let { list ->
+                list.forEach { item ->
+                    fragments.add(QuestionHolderFragment.newInstance(item.question))
+                }
+                if(list.size > 0)
+                    vmQuestions.currentQuestion.postValue(list[0])
+                vmQuestions.questions.removeObservers(viewLifecycleOwner)
             }
         }
         quesProgressBar.max = fragments.size
@@ -83,6 +88,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             it?.let { question ->
                 questionStat.text = "${question.index}/${fragments.size}"
                 updateQuestionProgress(question.index)
+                log("Question is $it")
                 tvThumbUp.text = question.upAnswers.english
                 tvThumbDown.text = question.downAnswers.english
             }
