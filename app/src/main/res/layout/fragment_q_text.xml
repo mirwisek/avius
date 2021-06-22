@@ -10,5 +10,4 @@
     android:gravity="center"
     android:paddingStart="@dimen/p_question_f_q"
     android:paddingEnd="@dimen/p_question_f_q"
-    android:layout_marginEnd="@dimen/fab_question_size"
     tools:text="How do you like our services?"/>

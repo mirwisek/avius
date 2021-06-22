@@ -6,6 +6,7 @@ import com.gesture.avius2.App
 import com.gesture.avius2.model.Answers
 import com.gesture.avius2.model.Question
 import com.gesture.avius2.model.QuestionMultiLang
+import com.gesture.avius2.utils.log
 import kotlinx.coroutines.launch
 
 class QuestionViewModel(app: Application) : AndroidViewModel(app) {
@@ -24,15 +25,7 @@ class QuestionViewModel(app: Application) : AndroidViewModel(app) {
         list
     }
 
-    val currentQuestion: MutableLiveData<Question> by lazy {
-        MutableLiveData<Question>().also {
-            it.postValue(
-                Transformations.map(questions) { list ->
-                    list[0]
-                }.value
-            )
-        }
-    }
+    val currentQuestion = MutableLiveData<Question>()
 
     // Recognition
     val thumbStatus = MutableLiveData(0)
