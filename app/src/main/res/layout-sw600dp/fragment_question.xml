@@ -99,7 +99,7 @@
         app:layout_constraintTop_toBottomOf="@id/btnThumbsUp"
         app:layout_constraintStart_toStartOf="@id/btnThumbsUp"
         app:layout_constraintEnd_toEndOf="@id/btnThumbsUp"
-        app:layout_constraintBottom_toTopOf="@id/logo"/>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.gesture.avius2.customui.GestureButton
         android:id="@+id/btnThumbsDown"
@@ -117,32 +117,7 @@
         app:layout_constraintTop_toBottomOf="@id/btnThumbsDown"
         app:layout_constraintStart_toStartOf="@id/btnThumbsDown"
         app:layout_constraintEnd_toEndOf="@id/btnThumbsDown"
-        app:layout_constraintBottom_toTopOf="@id/logo"/>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="@dimen/size_logo_f_question"
-        android:layout_height="@dimen/size_logo_f_question"
-        android:src="@drawable/logo"
-        android:maxHeight="@dimen/logo_max_height"
-        android:maxWidth="@dimen/logo_max_width"
-        android:minWidth="@dimen/logo_min_width"
-        android:minHeight="@dimen/logo_min_height"
-        android:layout_marginBottom="@dimen/m_logo_f_start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/gStart"/>
-
-    <ImageView
-        android:id="@+id/companyLogo"
-        android:layout_width="@dimen/size_logo_f_question"
-        android:layout_height="@dimen/size_logo_f_question"
-        android:src="@drawable/ic_company_logo"
-        android:maxHeight="@dimen/logo_max_height"
-        android:maxWidth="@dimen/logo_max_width"
-        android:minWidth="@dimen/logo_min_width"
-        android:minHeight="@dimen/logo_min_height"
-        android:layout_marginBottom="@dimen/m_logo_f_start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/gEnd"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
