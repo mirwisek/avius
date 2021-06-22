@@ -1,9 +1,11 @@
 package com.gesture.avius2.ui
 
+import android.graphics.Color
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
@@ -28,6 +30,7 @@ class StartFragment : Fragment(), OnPacketListener {
     private val resetRunnable = {
         resetCounter()
     }
+    private var themeColor: Int = -1
 
     companion object {
         const val TAG = "Avius.StartFragment"
@@ -57,6 +60,10 @@ class StartFragment : Fragment(), OnPacketListener {
 
         handler = Handler(Looper.getMainLooper())
         vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
+        themeColor = if(vmStart.themeColor.isNotBlank())
+            Color.parseColor(vmStart.themeColor)
+        else
+            ContextCompat.getColor(requireContext(), R.color.blue_main)
 
         // Start Listening to packets
         (requireActivity() as MainActivity).setPacketListener(this, TAG)
@@ -91,7 +98,9 @@ class StartFragment : Fragment(), OnPacketListener {
             }
         }
 
-        val gestureButton = view.findViewById<GestureButton>(R.id.gestureButton)
+        val gestureButton = view.findViewById<GestureButton>(R.id.gestureButton).apply {
+            changeCircleColor(themeColor)
+        }
         val progressBar = gestureButton.progressBar
 
         vmStart.progressBar.observe(viewLifecycleOwner) {

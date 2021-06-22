@@ -51,9 +51,8 @@ class StartActivity : AppCompatActivity() {
         }
 
         etCompanyID.addTextChangedListener(object: TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+            override fun afterTextChanged(p0: Editable?) { }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p0.isNullOrEmpty() || p0.length < 3) {
@@ -62,11 +61,6 @@ class StartActivity : AppCompatActivity() {
                     etCompanyID.error = null
                 }
             }
-
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
-
         })
 
         btnSubmit.setOnClickListener {
@@ -82,7 +76,10 @@ class StartActivity : AppCompatActivity() {
                 ApiHelper.getQuestions(company, pointId) { result ->
                     result.fold(
                         onSuccess = {
-                            (application as App).repository.questions = it
+                            (application as App).repository.apply {
+                                questions = it
+                                themeColor = it.point.form.theme_color
+                            }
                             dialogLoading.dismiss()
                             start()
                         },

@@ -13,6 +13,7 @@ class QuestionViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repository = (app as App).repository
     private val repoQuestions = MutableLiveData(repository.questions?.point?.form?.questions)
+    val themeColor = repository.themeColor
 
     val questions = Transformations.map(repoQuestions) { ques ->
         val list = arrayListOf<Question>()

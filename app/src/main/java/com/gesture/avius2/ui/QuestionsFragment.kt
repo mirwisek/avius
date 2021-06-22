@@ -1,27 +1,23 @@
 package com.gesture.avius2.ui
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.*
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.size
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
-import com.gesture.avius2.App
 import com.gesture.avius2.R
-import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
-import com.gesture.avius2.model.Question
 import com.gesture.avius2.utils.log
-import com.gesture.avius2.utils.toast
 import com.gesture.avius2.viewmodels.QuestionViewModel
-import com.gesture.avius2.viewmodels.StartViewModel
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.mediapipe.formats.proto.LandmarkProto
 
 class QuestionsFragment : Fragment() , OnPacketListener {
@@ -39,12 +35,15 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     }
 
     private var shouldTakeInput = false
+    private lateinit var adapter: QuestionsPagerAdapter
+    private var themeColor: Int = -1
 
     companion object {
         const val TAG = "Avius.QuestionFragment"
         const val TIMER_COUNT = 3000L
         const val TICK = 100L
-        const val NEXT_QUESTION_DELAY = 5000L
+        const val NEXT_QUESTION_DELAY = 3000L
+        // Value after which the thumb status is taken as selected
         const val PROGRESS_APPROVAL_THRESHOLD = 28  // Max Progressbar value is 30
     }
 
@@ -65,24 +64,42 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         val v = inflater.inflate(R.layout.fragment_question, container, false)
         vmQuestions = ViewModelProvider(this).get(QuestionViewModel::class.java)
 
+        /**
+         * Parse Theme Color from API
+         * Because themeColor's default value is '' therefore the not blank check
+         */
+        themeColor = if(vmQuestions.themeColor.isNotBlank())
+            Color.parseColor(vmQuestions.themeColor)
+        else
+            ContextCompat.getColor(requireContext(), R.color.blue_main)
+
         viewPager = v.findViewById(R.id.vpQuestion)
         quesProgressBar = v.findViewById(R.id.progress)
-        tvThumbUp = v.findViewById(R.id.thumbUpLabel)
-        tvThumbDown = v.findViewById(R.id.thumbDownLabel)
+        tvThumbUp = v.findViewById<TextView>(R.id.thumbUpLabel).apply {
+            setTextColor(themeColor)
+        }
+        tvThumbDown = v.findViewById<TextView>(R.id.thumbDownLabel).apply {
+            setTextColor(themeColor)
+        }
         val questionStat = v.findViewById<TextView>(R.id.textQuestionStat)
 
         val fragments = arrayListOf<QuestionHolderFragment>()
+        adapter = QuestionsPagerAdapter(lifecycle, childFragmentManager)
+        viewPager.adapter = adapter
+
         vmQuestions.questions.observe(viewLifecycleOwner) {
             it?.let { list ->
                 list.forEach { item ->
-                    fragments.add(QuestionHolderFragment.newInstance(item.question))
+                    fragments.add(QuestionHolderFragment.newInstance(item.question, themeColor))
                 }
                 if(list.size > 0)
                     vmQuestions.currentQuestion.postValue(list[0])
+
+                adapter.setList(fragments)
+                quesProgressBar.max = fragments.size
                 vmQuestions.questions.removeObservers(viewLifecycleOwner)
             }
         }
-        quesProgressBar.max = fragments.size
 
         vmQuestions.currentQuestion.observe(viewLifecycleOwner) {
             it?.let { question ->
@@ -92,9 +109,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
                 tvThumbDown.text = question.downAnswers
             }
         }
-
-        val adapter = QuestionsPagerAdapter(lifecycle, fragments, childFragmentManager)
-        viewPager.adapter = adapter
 
         return v
     }
@@ -198,7 +212,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         shouldTakeInput = false
         // TODO: If app crashes then adjust back in if-else clause
         val next = viewPager.currentItem + 1
-        if(next <= viewPager.size) {
+        if(next < adapter.itemCount) {
             vmQuestions.nextQuestion()
             viewPager.setCurrentItem(next, true)
             handler.postDelayed({
