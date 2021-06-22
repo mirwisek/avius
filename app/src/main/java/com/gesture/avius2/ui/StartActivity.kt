@@ -32,6 +32,10 @@ class StartActivity : AppCompatActivity() {
         val etPointID = findViewById<TextInputEditText>(R.id.etPointID)
         val btnSubmit = findViewById<MaterialButton>(R.id.btnSubmit)
 
+        // DEBUG ONLY
+        etPointID.setText("11")
+        etCompanyID.setText("IMH0010")
+
         val errorView = findViewById<ConstraintLayout>(R.id.errorLayout)
         errorView.setOnClickListener {
             errorView.invisible()

@@ -11,10 +11,12 @@ import android.widget.TextView
 import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.gesture.avius2.App
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
+import com.gesture.avius2.model.Question
 import com.gesture.avius2.utils.log
 import com.gesture.avius2.utils.toast
 import com.gesture.avius2.viewmodels.QuestionViewModel
@@ -69,16 +71,21 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         tvThumbDown = v.findViewById(R.id.thumbDownLabel)
         val questionStat = v.findViewById<TextView>(R.id.textQuestionStat)
 
-        val fragments = listOf(
-            QuestionHolderFragment.newInstance("How was your day?"),
-            QuestionHolderFragment.newInstance("How was your stay?")
-        )
+        val fragments = arrayListOf<QuestionHolderFragment>()
+        vmQuestions.questions.observe(viewLifecycleOwner) {
+            it?.forEach { item ->
+                fragments.add(QuestionHolderFragment.newInstance(item.question))
+            }
+        }
         quesProgressBar.max = fragments.size
 
-        vmQuestions.totalQuestions.postValue(fragments.size)
         vmQuestions.currentQuestion.observe(viewLifecycleOwner) {
-            questionStat.text = "$it/${fragments.size}"
-            updateQuestionProgress(it)
+            it?.let { question ->
+                questionStat.text = "${question.index}/${fragments.size}"
+                updateQuestionProgress(question.index)
+                tvThumbUp.text = question.upAnswers.english
+                tvThumbDown.text = question.downAnswers.english
+            }
         }
 
         val adapter = QuestionsPagerAdapter(lifecycle, fragments, childFragmentManager)
@@ -91,7 +98,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         super.onViewCreated(view, savedInstanceState)
 
         handler = Handler(Looper.getMainLooper())
-        vmQuestions.currentQuestion.postValue(1)
 
         // Start Listening to packets
         (requireActivity() as MainActivity).setPacketListener(this, TAG)
@@ -171,16 +177,24 @@ class QuestionsFragment : Fragment() , OnPacketListener {
                     vmQuestions.tick()
             }
         } else {
+            saveAnswer(dir)
             nextQuestion()
             resetCounter()
         }
     }
 
+    private fun saveAnswer(direction: Int) {
+        val q = vmQuestions.currentQuestion.value!!
+        val ans = if(direction == 1) q.upAnswers else q.downAnswers
+        vmQuestions.currentQuestion.value!!.answer = ans.english
+    }
+
     private fun nextQuestion() {
         shouldTakeInput = false
-        vmQuestions.nextQuestion()
+        // TODO: If app crashes then adjust back in if-else clause
         val next = viewPager.currentItem + 1
         if(next <= viewPager.size) {
+            vmQuestions.nextQuestion()
             viewPager.setCurrentItem(next, true)
             handler.postDelayed({
                 shouldTakeInput = true
