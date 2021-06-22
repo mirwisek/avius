@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/bg"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -81,28 +82,40 @@
         android:orientation="vertical" />
 
     <com.gesture.avius2.customui.GestureButton
-        android:layout_width="160dp"
-        android:layout_height="160dp"
         android:id="@+id/btnThumbsUp"
-        app:layoutPadding="5dp"
-        app:marginProgressFit="@dimen/margin_progress_fit_f_question"
-        app:thumbPadding="@dimen/thumb_padding_gesture_btn_f_question"
+        style="@style/FragmentQuestionGestureButton"
         app:thumbDrawable="@drawable/ic_thumb_up"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/gStart"
         app:layout_constraintTop_toBottomOf="@id/fabQuestion"
-        app:layout_constraintBottom_toTopOf="@id/logo" />
+        app:layout_constraintBottom_toTopOf="@id/thumbUpLabel" />
+
+    <TextView
+        android:id="@+id/thumbUpLabel"
+        tools:text="GOOD"
+        style="@style/GestureButtonLabel"
+        app:layout_constraintTop_toBottomOf="@id/btnThumbsUp"
+        app:layout_constraintStart_toStartOf="@id/btnThumbsUp"
+        app:layout_constraintEnd_toEndOf="@id/btnThumbsUp"
+        app:layout_constraintBottom_toTopOf="@id/logo"/>
 
     <com.gesture.avius2.customui.GestureButton
-        android:layout_width="160dp"
-        android:layout_height="160dp"
         android:id="@+id/btnThumbsDown"
-        app:layoutPadding="5dp"
-        app:marginProgressFit="@dimen/margin_progress_fit_f_question"
-        app:thumbPadding="@dimen/thumb_padding_gesture_btn_f_question"
+        style="@style/FragmentQuestionGestureButton"
         app:thumbDrawable="@drawable/ic_thumbs_down"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintEnd_toEndOf="@id/gEnd"
         app:layout_constraintTop_toBottomOf="@id/fabQuestion"
-        app:layout_constraintBottom_toTopOf="@id/logo" />
+        app:layout_constraintBottom_toTopOf="@id/thumbDownLabel" />
+
+    <TextView
+        android:id="@+id/thumbDownLabel"
+        tools:text="BAD"
+        style="@style/GestureButtonLabel"
+        app:layout_constraintTop_toBottomOf="@id/btnThumbsDown"
+        app:layout_constraintStart_toStartOf="@id/btnThumbsDown"
+        app:layout_constraintEnd_toEndOf="@id/btnThumbsDown"
+        app:layout_constraintBottom_toTopOf="@id/logo"/>
 
     <ImageView
         android:id="@+id/logo"

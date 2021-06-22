@@ -10,32 +10,37 @@ import kotlinx.coroutines.launch
 
 class QuestionViewModel: ViewModel() {
 
-    val oldStatus = MutableLiveData<Int>()
-    val thumbStatus = MutableLiveData<Int>()
-    val progressBar = MutableLiveData(0)
-    val hasValueChanged = MutableLiveData(false)
+    val thumbStatus = MutableLiveData(0)
+    val progressBarUp = MutableLiveData(0)
+    val progressBarDown = MutableLiveData(0)
 
     val currentQuestion = MutableLiveData(0)
-
-    // If progress exceeds beyond 80% there is no going back
-    val isCancelable = MutableLiveData(true)
+    val totalQuestions = MutableLiveData(0)
 
     val handDetectedLastTimestamp = MutableLiveData<Long>()
 
+    fun nextQuestion() {
+        if(currentQuestion.value!! <= totalQuestions.value!!)
+            currentQuestion.postValue(currentQuestion.value!! + 1)
+    }
+
     fun tick() {
         viewModelScope.launch {
-            progressBar.value = progressBar.value!!.plus(3)
+            if(thumbStatus.value == 1) {
+                progressBarUp.value = progressBarUp.value!!.plus(3)
+                progressBarDown.value = 0   // Reset the other
+            } else if(thumbStatus.value == -1) {
+                progressBarDown.value = progressBarDown.value!!.plus(3)
+                progressBarUp.value = 0   // Reset the other
+            }
         }
     }
 
-    fun updateThumbStatus(thumbDir: Int) {
-        viewModelScope.launch {
-            // If new value is different, then store in variable so counter can reset progress
-            if(oldStatus.value != thumbDir)
-                hasValueChanged.value = true
-            oldStatus.value = thumbStatus.value
-            thumbStatus.value = thumbDir
-        }
+    fun resetViewModel() {
+        thumbStatus.postValue(0)
+        progressBarDown.postValue(0)
+        progressBarUp.postValue(0)
+        handDetectedLastTimestamp.postValue(0)
     }
 
 }

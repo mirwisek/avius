@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="30dp"
+    tools:ignore="MissingDefaultResource">
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabPower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:backgroundTint="@color/white"
+        app:collapsedSize="@dimen/dialog_fab_size"
+        app:icon="@drawable/ic_power"
+        app:iconSize="@dimen/dialog_icon_size"
+        app:iconTint="@color/teal_light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Are you sure you want to log out?"
+        android:textColor="@color/teal_light"
+        android:textSize="@dimen/dialog_msg_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fabPower" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_no"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:minWidth="100dp"
+        android:text="No"
+        android:textColor="@color/red"
+        app:layout_constraintStart_toStartOf="@id/msg"
+        app:layout_constraintTop_toBottomOf="@id/msg"
+        app:strokeColor="@color/red" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_yes"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:minWidth="100dp"
+        android:text="Yes"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@id/msg"
+        app:layout_constraintTop_toBottomOf="@id/msg"
+        app:strokeColor="@color/black" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

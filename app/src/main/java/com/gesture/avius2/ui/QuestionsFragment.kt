@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
+import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
 import com.gesture.avius2.utils.log
 import com.gesture.avius2.utils.toast
@@ -25,6 +26,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var quesProgressBar: ProgressBar
+    private lateinit var tvThumbUp: TextView
+    private lateinit var tvThumbDown: TextView
 
     private lateinit var vmQuestions: QuestionViewModel
     private var countDownTimer: CountDownTimer? = null
@@ -33,12 +36,15 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         resetCounter()
     }
 
+    private var shouldTakeInput = false
+
     companion object {
         const val TAG = "Avius.QuestionFragment"
         const val TIMER_COUNT = 3000L
         const val TICK = 100L
+        const val NEXT_QUESTION_DELAY = 5000L
+        const val PROGRESS_APPROVAL_THRESHOLD = 28  // Max Progressbar value is 30
     }
-
 
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
@@ -59,6 +65,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
         viewPager = v.findViewById(R.id.vpQuestion)
         quesProgressBar = v.findViewById(R.id.progress)
+        tvThumbUp = v.findViewById(R.id.thumbUpLabel)
+        tvThumbDown = v.findViewById(R.id.thumbDownLabel)
         val questionStat = v.findViewById<TextView>(R.id.textQuestionStat)
 
         val fragments = listOf(
@@ -66,8 +74,11 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             QuestionHolderFragment.newInstance("How was your stay?")
         )
         quesProgressBar.max = fragments.size
+
+        vmQuestions.totalQuestions.postValue(fragments.size)
         vmQuestions.currentQuestion.observe(viewLifecycleOwner) {
             questionStat.text = "$it/${fragments.size}"
+            updateQuestionProgress(it)
         }
 
         val adapter = QuestionsPagerAdapter(lifecycle, fragments, childFragmentManager)
@@ -85,21 +96,33 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         // Start Listening to packets
         (requireActivity() as MainActivity).setPacketListener(this, TAG)
 
+        // Enable input after delay, give user a chance to read the question
+        handler.postDelayed({
+            shouldTakeInput = true
+        }, NEXT_QUESTION_DELAY)
+
         /**
          * Observe Model values
          */
-
         vmQuestions.thumbStatus.observe(viewLifecycleOwner) {
-            if (it == 1) {
+            // Activate on thumbup or thumbdown
+            if (it == 1 || it == -1) {
                 if (countDownTimer == null) {
                     countDownTimer = getCountDownTimer().start()
                 }
             }
         }
 
-        vmQuestions.currentQuestion.observe(viewLifecycleOwner) {
-            updateQuestionProgress(it)
+        val btnThumbsUp = view.findViewById<GestureButton>(R.id.btnThumbsUp)
+        vmQuestions.progressBarUp.observe(viewLifecycleOwner) {
+            btnThumbsUp.progressBar.progress = it
         }
+
+        val btnThumbsDown = view.findViewById<GestureButton>(R.id.btnThumbsDown)
+        vmQuestions.progressBarDown.observe(viewLifecycleOwner) {
+            btnThumbsDown.progressBar.progress = it
+        }
+
     }
 
     // Reset values in ViewModel for new question
@@ -131,20 +154,20 @@ class QuestionsFragment : Fragment() , OnPacketListener {
      */
 
     private fun updateCounter() {
-        // While it is cancelable then make checks otherwise continue
-        if(vmQuestions.isCancelable.value!!) {
+        val dir = vmQuestions.thumbStatus.value!!
+        val progressBar = if(dir == 1) vmQuestions.progressBarUp else vmQuestions.progressBarDown
+        // After the threshold progress is reached take the input as accepted
+        if(progressBar.value!! < PROGRESS_APPROVAL_THRESHOLD) {
             // 0 means no thumb detected
             if (vmQuestions.thumbStatus.value == 0) {
                 resetCounter()
-            } else if (vmQuestions.hasValueChanged.value == true) {
-                resetCounter()
-                vmQuestions.hasValueChanged.value = false
             } else {
                 val lastTime = vmQuestions.handDetectedLastTimestamp.value
-                if (lastTime != null && System.currentTimeMillis().minus(lastTime) > StartFragment.TICK)
+                // When the last frame that detected hand, was twice the tick rate then reset
+                // When it is single TICK then it undos TOO OFTEN
+                if (lastTime != null && System.currentTimeMillis().minus(lastTime) > TICK * 2)
                     resetCounter()
                 else // Proceed
-//                vmStart.continueProgress()
                     vmQuestions.tick()
             }
         } else {
@@ -154,16 +177,24 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     }
 
     private fun nextQuestion() {
+        shouldTakeInput = false
+        vmQuestions.nextQuestion()
         val next = viewPager.currentItem + 1
-        if(next < viewPager.size) {
+        if(next <= viewPager.size) {
             viewPager.setCurrentItem(next, true)
+            handler.postDelayed({
+                shouldTakeInput = true
+            }, NEXT_QUESTION_DELAY)
+        } else {
+            exitApp()
         }
     }
 
     private fun resetCounter() {
         countDownTimer?.cancel()
         countDownTimer = null
-        vmQuestions.progressBar.value = 0
+        vmQuestions.progressBarUp.value = 0
+        vmQuestions.progressBarDown.value = 0
     }
 
     private fun exitApp() {
@@ -171,17 +202,18 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     }
 
     override fun onLandmarkPacket(direction: Int) {
-        vmQuestions.thumbStatus.postValue(direction)
+        if(shouldTakeInput) {
+            vmQuestions.thumbStatus.postValue(direction)
+        }
     }
 
     override fun onHandednessPacket(handedness: List<LandmarkProto.Landmark>) {
-
-//        vmStart.handCount.postValue(handedness.size)
-        vmQuestions.handDetectedLastTimestamp.postValue(System.currentTimeMillis())
-        // Will be delaying resetRunnable while the progress completes
-        // otherwise if hand leaves the frame then resetRunnable will be called
-        handler.removeCallbacksAndMessages(null)
-        handler.postDelayed(resetRunnable, 1000L)
-//            log("Packet:: ${handedness.size} and ${handedness[0]}")
+        if(shouldTakeInput) {
+            vmQuestions.handDetectedLastTimestamp.postValue(System.currentTimeMillis())
+            // Will be delaying resetRunnable while the progress completes
+            // otherwise if hand leaves the frame then resetRunnable will be called
+            handler.removeCallbacksAndMessages(null)
+            handler.postDelayed(resetRunnable, 1000L)
+        }
     }
 }
