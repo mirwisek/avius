@@ -7,9 +7,14 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class QuestionsPagerAdapter(
     private val lifecycle: Lifecycle,
-    private val fragments: List<Fragment>,
-    fm: FragmentManager
+    fm: FragmentManager,
+    private var fragments: List<Fragment> = listOf()
 ) : FragmentStateAdapter(fm, lifecycle) {
+
+    fun setList(fms: List<Fragment>) {
+        fragments = fms
+        notifyDataSetChanged()
+    }
 
     override fun getItemCount(): Int {
         return fragments.size
