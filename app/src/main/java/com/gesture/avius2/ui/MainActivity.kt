@@ -1,10 +1,10 @@
 package com.gesture.avius2.ui
 
-import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.SurfaceTexture
-import android.os.*
+import android.opengl.GLES20
+import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.SurfaceHolder
@@ -18,17 +18,22 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
-import com.gesture.avius2.utils.*
+import com.gesture.avius2.utils.gone
 import com.gesture.avius2.viewmodels.MainViewModel
-import com.google.mediapipe.components.*
 import com.google.mediapipe.components.CameraHelper.CameraFacing
+import com.google.mediapipe.components.CameraXPreviewHelper
+import com.google.mediapipe.components.ExternalTextureConverter
+import com.google.mediapipe.components.FrameProcessor
+import com.google.mediapipe.components.PermissionHelper
 import com.google.mediapipe.formats.proto.LandmarkProto
 import com.google.mediapipe.formats.proto.LandmarkProto.NormalizedLandmarkList
 import com.google.mediapipe.framework.AndroidAssetUtil
 import com.google.mediapipe.framework.Packet
 import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
+import com.google.mediapipe.glutil.ExternalTextureRenderer
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -258,8 +263,14 @@ class MainActivity : AppCompatActivity() {
     private fun startCamera() {
         cameraHelper = CameraXPreviewHelper()
         cameraHelper!!.setOnCameraStartedListener { surfaceTexture: SurfaceTexture? ->
+            surfaceTexture?.apply {
+                setOnFrameAvailableListener {
+                    Log.e("ffnet", "Frame available")
+                }
+            }
             onCameraStarted(surfaceTexture!!)
         }
+
         val cameraFacing = CameraFacing.FRONT
         cameraHelper!!.startCamera(
             this, cameraFacing,  /*unusedSurfaceTexture=*/null, cameraTargetResolution()
@@ -288,7 +299,13 @@ class MainActivity : AppCompatActivity() {
             if (isCameraRotated) displaySize.height else displaySize.width,
             if (isCameraRotated) displaySize.width else displaySize.height
         )
+        /**
+         *  FIX CameraBlackout ISSUE
+         *  Github ISSUE: https://github.com/google/mediapipe/issues/1508
+         */
+        previewFrameTexture!!.updateTexImage()
     }
+
 
     private fun setupPreviewDisplayView() {
         previewDisplayView!!.visibility = View.GONE
@@ -323,13 +340,13 @@ class MainActivity : AppCompatActivity() {
 
         init {
             // Load all native libraries needed by the app.
-            try {
-                System.loadLibrary("mediapipe_jni")
-                System.loadLibrary("opencv_java3")
-            } catch (e: UnsatisfiedLinkError) {
-                log("Error $e")
-                wasAbleToLoadLibrary = false
-            }
+//            try {
+            System.loadLibrary("mediapipe_jni")
+            System.loadLibrary("opencv_java3")
+//            } catch (e: UnsatisfiedLinkError) {
+//                log("Error $e")
+//                wasAbleToLoadLibrary = false
+//            }
         }
 
         private const val TAG = "MainActivity"

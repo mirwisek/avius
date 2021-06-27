@@ -47,4 +47,8 @@
         <item name="android:gravity">center</item>
         <item name="android:layout_marginTop">20dp</item>
     </style>
+
+    <style name="FragmentStartBGStyle">
+<!--        <item name="background">@color/bg</item>-->
+    </style>
 </resources>
