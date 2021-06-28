@@ -4,6 +4,7 @@ package com.google.mediapipe.glutil;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
@@ -59,25 +60,28 @@ public class ExternalTextureRenderer {
         surfaceTexture.updateTexImage();
         surfaceTexture.getTransformMatrix(this.textureTransformMatrix);
 
+        // Set a fixed orientation as landscape
         // Added by MIR
-        switch (rotation) {
-            case 0:
-                break;
-            case 90:
-                Matrix.rotateM(textureTransformMatrix, 0, 90, 0, 0, 1);
-                Matrix.translateM(textureTransformMatrix, 0, 0, -1, 0);
-                break;
-            case 180:
-                Matrix.rotateM(textureTransformMatrix, 0, 180, 0, 0, 1);
-                Matrix.translateM(textureTransformMatrix, 0, -1, -1, 0);
-                break;
-            case 270:
-                Matrix.rotateM(textureTransformMatrix, 0, 270, 0, 0, 1);
-                Matrix.translateM(textureTransformMatrix, 0, -1, 0, 0);
-                break;
-            default:
-                //unknown
-        }
+        Matrix.rotateM(textureTransformMatrix, 0, 270, 0, 0, 1);
+        Matrix.translateM(textureTransformMatrix, 0, -1, 0, 0);
+//        switch (rotation) {
+//            case 0:
+//                break;
+//            case 90:
+//                Matrix.rotateM(textureTransformMatrix, 0, 90, 0, 0, 1);
+//                Matrix.translateM(textureTransformMatrix, 0, 0, -1, 0);
+//                break;
+//            case 180:
+//                Matrix.rotateM(textureTransformMatrix, 0, 180, 0, 0, 1);
+//                Matrix.translateM(textureTransformMatrix, 0, -1, -1, 0);
+//                break;
+//            case 270:
+//                Matrix.rotateM(textureTransformMatrix, 0, 270, 0, 0, 1);
+//                Matrix.translateM(textureTransformMatrix, 0, -1, 0, 0);
+//                break;
+//            default:
+//                //unknown
+//        }
 
         GLES20.glTexParameteri(36197, 10241, 9729);
         GLES20.glTexParameteri(36197, 10240, 9729);

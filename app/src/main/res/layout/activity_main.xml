@@ -17,7 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/footer"
         android:elevation="3dp"
-        android:background="@color/bg"
+        style="@style/FragmentStartBGStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

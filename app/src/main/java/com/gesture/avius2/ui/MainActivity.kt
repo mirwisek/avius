@@ -2,15 +2,12 @@ package com.gesture.avius2.ui
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.SurfaceTexture
-import android.opengl.GLES20
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +28,6 @@ import com.google.mediapipe.framework.AndroidAssetUtil
 import com.google.mediapipe.framework.Packet
 import com.google.mediapipe.framework.PacketGetter
 import com.google.mediapipe.glutil.EglManager
-import com.google.mediapipe.glutil.ExternalTextureRenderer
 import java.util.*
 
 
@@ -78,11 +74,7 @@ class MainActivity : AppCompatActivity() {
             val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
                 ?: StartFragment()) as StartFragment
 
-            //TODO: Remove this val, for debug only
-//        val fragmentQuestion = QuestionsFragment()
-
             supportFragmentManager.beginTransaction()
-//            .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
                 .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
                 .commit()
 
@@ -193,6 +185,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+//    override fun onConfigurationChanged(newConfig: Configuration) {
+//        super.onConfigurationChanged(newConfig)
+//        // Checks the orientation of the screen
+//        val rotation = windowManager.defaultDisplay.rotation
+//        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            converter!!.setRotation((360 - rotation) % 360)
+//        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+//            converter!!.setRotation((360 - rotation) % 360)
+//        }
+//    }
+
     /**
      * When fragment is ready it will make a call to activity to listener for packets
      * after it has initialized all variables
@@ -263,11 +266,6 @@ class MainActivity : AppCompatActivity() {
     private fun startCamera() {
         cameraHelper = CameraXPreviewHelper()
         cameraHelper!!.setOnCameraStartedListener { surfaceTexture: SurfaceTexture? ->
-            surfaceTexture?.apply {
-                setOnFrameAvailableListener {
-                    Log.e("ffnet", "Frame available")
-                }
-            }
             onCameraStarted(surfaceTexture!!)
         }
 
@@ -284,6 +282,7 @@ class MainActivity : AppCompatActivity() {
     protected fun onPreviewDisplaySurfaceChanged(
         holder: SurfaceHolder?, format: Int, width: Int, height: Int
     ) {
+
         // (Re-)Compute the ideal size of the camera-preview display (the area that the
         // camera-preview frames get rendered onto, potentially with scaling and rotation)
         // based on the size of the SurfaceView that contains the display.

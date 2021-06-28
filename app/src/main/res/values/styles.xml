@@ -49,6 +49,7 @@
     </style>
 
     <style name="FragmentStartBGStyle">
-<!--        <item name="background">@color/bg</item>-->
+        <item name="background">@color/bg</item>
+        <item name="android:background">@color/bg</item>
     </style>
 </resources>
