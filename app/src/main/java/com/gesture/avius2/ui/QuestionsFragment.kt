@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
@@ -52,8 +54,10 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
-        // Safely Remove callbacks
-        (requireActivity() as MainActivity).removePacketListener(TAG)
+        if(!BuildConfig.DEBUG) {
+            // Safely Remove callbacks
+            (requireActivity() as MainActivity).removePacketListener(TAG)
+        }
         super.onDestroy()
     }
 
@@ -120,8 +124,10 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
         handler = Handler(Looper.getMainLooper())
 
-        // Start Listening to packets
-        (requireActivity() as MainActivity).setPacketListener(this, TAG)
+        if(!BuildConfig.DEBUG) {
+            // Start Listening to packets
+            (requireActivity() as MainActivity).setPacketListener(this, TAG)
+        }
 
         // Enable input after delay, give user a chance to read the question
         handler.postDelayed({
@@ -144,10 +150,16 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         vmQuestions.progressBarUp.observe(viewLifecycleOwner) {
             btnThumbsUp.progressBar.progress = it
         }
+        btnThumbsUp.setOnClickListener {
+            proceedNext(1)
+        }
 
         val btnThumbsDown = view.findViewById<GestureButton>(R.id.btnThumbsDown)
         vmQuestions.progressBarDown.observe(viewLifecycleOwner) {
             btnThumbsDown.progressBar.progress = it
+        }
+        btnThumbsDown.setOnClickListener {
+            proceedNext(-1)
         }
 
     }
@@ -195,10 +207,17 @@ class QuestionsFragment : Fragment() , OnPacketListener {
                     vmQuestions.tick()
             }
         } else {
-            saveAnswer(dir)
-            nextQuestion()
-            resetCounter()
+            proceedNext(dir)
         }
+    }
+
+    /**
+     * @param directionThumb 1 means ThumbUp was selected while -1 means ThumbDown
+     */
+    private fun proceedNext(directionThumb: Int) {
+        saveAnswer(directionThumb)
+        nextQuestion()
+        resetCounter()
     }
 
     private fun saveAnswer(direction: Int) {

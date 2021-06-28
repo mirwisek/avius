@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
@@ -42,8 +43,10 @@ class StartFragment : Fragment(), OnPacketListener {
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
-        // Safely Remove callbacks
-        (requireActivity() as MainActivity).removePacketListener(TAG)
+        if(!BuildConfig.DEBUG) {
+            // Safely Remove callbacks
+            (requireActivity() as MainActivity).removePacketListener(TAG)
+        }
         super.onDestroy()
     }
 
@@ -65,8 +68,11 @@ class StartFragment : Fragment(), OnPacketListener {
         else
             ContextCompat.getColor(requireContext(), R.color.blue_main)
 
-        // Start Listening to packets
-        (requireActivity() as MainActivity).setPacketListener(this, TAG)
+        // Don't initialize in tablet testing mode
+        if(!BuildConfig.DEBUG) {
+            // Start Listening to packets
+            (requireActivity() as MainActivity).setPacketListener(this, TAG)
+        }
         /**
          * Setup Exit Dialog
          */
@@ -100,6 +106,9 @@ class StartFragment : Fragment(), OnPacketListener {
 
         val gestureButton = view.findViewById<GestureButton>(R.id.gestureButton).apply {
             changeCircleColor(themeColor)
+            setOnClickListener {
+                onFinish?.invoke()
+            }
         }
         val progressBar = gestureButton.progressBar
 
@@ -121,7 +130,7 @@ class StartFragment : Fragment(), OnPacketListener {
                 updateCounter()
             }
 
-            override fun onFinish() {}
+            override fun onFinish() { }
         }
     }
 

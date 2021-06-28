@@ -105,7 +105,8 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun start() {
-        val intent = Intent(this, MainActivity::class.java)
+//        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(this, TestActivity::class.java)
         startActivity(intent)
         finish()
     }

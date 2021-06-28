@@ -3,6 +3,7 @@ package com.gesture.avius2.ui
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.util.Log
@@ -11,12 +12,15 @@ import android.view.*
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.utils.gone
 import com.gesture.avius2.viewmodels.MainViewModel
+import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.mediapipe.components.CameraHelper.CameraFacing
 import com.google.mediapipe.components.CameraXPreviewHelper
 import com.google.mediapipe.components.ExternalTextureConverter
@@ -69,7 +73,18 @@ class MainActivity : AppCompatActivity() {
         if (wasAbleToLoadLibrary) {
 
             setContentView(R.layout.activity_main)
+
             vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
+            val vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
+
+            /**
+             * Set theme color for the statusbar from the API
+             */
+            val themeColor = if (vmStart.themeColor.isNotBlank())
+                Color.parseColor(vmStart.themeColor)
+            else
+                ContextCompat.getColor(this, R.color.blue_main)
+            window.statusBarColor = themeColor
 
             val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
                 ?: StartFragment()) as StartFragment
