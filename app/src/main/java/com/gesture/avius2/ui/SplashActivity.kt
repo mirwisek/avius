@@ -2,8 +2,10 @@ package com.gesture.avius2.ui
 
 import android.animation.Animator
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.airbnb.lottie.LottieAnimationView
 import com.gesture.avius2.App
@@ -30,8 +32,15 @@ class SplashActivity : AppCompatActivity() {
         }
 
         vmApp.getDbSettings().observe(this) { settings ->
-            settings?.apply {
-                (application as App).repository.settings = this
+            settings?.let {
+                (application as App).apply {
+                    repository.settings = it
+                    themeColor = if(it.themeColor.isNotBlank())
+                        Color.parseColor(it.themeColor)
+                    else
+                        ContextCompat.getColor(applicationContext, R.color.blue_main)
+                    window.statusBarColor = themeColor
+                }
             }
         }
 

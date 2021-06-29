@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.gesture.avius2.App
 import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
@@ -79,10 +80,7 @@ class StartFragment : Fragment(), OnPacketListener {
 
         handler = Handler(Looper.getMainLooper())
         vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
-        themeColor = if(vmStart.themeColor.isNotBlank())
-            Color.parseColor(vmStart.themeColor)
-        else
-            ContextCompat.getColor(requireContext(), R.color.blue_main)
+        themeColor = (requireActivity().application as App).themeColor
 
         // Don't initialize in tablet testing mode
         if(!BuildConfig.DEBUG) {

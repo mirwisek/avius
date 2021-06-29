@@ -16,6 +16,7 @@ import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.gesture.avius2.App
 import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.GestureButton
@@ -88,14 +89,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         val v = inflater.inflate(R.layout.fragment_question, container, false)
         vmQuestions = ViewModelProvider(this).get(QuestionViewModel::class.java)
 
-        /**
-         * Parse Theme Color from API
-         * Because themeColor's default value is '' therefore the not blank check
-         */
-        themeColor = if(vmQuestions.themeColor.isNotBlank())
-            Color.parseColor(vmQuestions.themeColor)
-        else
-            ContextCompat.getColor(requireContext(), R.color.blue_main)
+        themeColor = (requireActivity().application as App).themeColor
 
         viewPager = v.findViewById(R.id.vpQuestion)
         quesProgressBar = v.findViewById(R.id.progress)
