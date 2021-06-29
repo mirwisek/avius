@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gesture.avius2.App
 import com.gesture.avius2.db.AppDatabase
 import com.gesture.avius2.db.QuestionEntity
+import com.gesture.avius2.db.SettingsEntity
 import com.gesture.avius2.model.Answers
 import com.gesture.avius2.model.Question
 import com.gesture.avius2.model.QuestionMultiLang
@@ -34,6 +35,16 @@ class AppViewModel(val app: Application): AndroidViewModel(app) {
             db.questionsDao().insert(*entities.toTypedArray())
         }
     }
+
+    fun saveSettings(data: ResponseData) {
+        viewModelScope.launch {
+            val entity = SettingsEntity(data.point.form.theme_color, data.logo)
+            (app as App).repository.settings = entity
+            db.settingsDao().insert(entity)
+        }
+    }
+
+    fun getDbSettings() = db.settingsDao().getAllLive()
 
     fun getDbQuestions() = db.questionsDao().getAllLive()
 }

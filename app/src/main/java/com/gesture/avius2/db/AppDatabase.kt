@@ -9,13 +9,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [QuestionEntity::class],
+    entities = [QuestionEntity::class, SettingsEntity::class],
     version = 1, exportSchema = false
 )
 
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun questionsDao(): QuestionsDao
+    abstract fun settingsDao(): SettingsDao
 
     companion object {
         @Volatile

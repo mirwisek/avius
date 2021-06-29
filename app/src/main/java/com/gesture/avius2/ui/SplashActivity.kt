@@ -29,6 +29,12 @@ class SplashActivity : AppCompatActivity() {
             }
         }
 
+        vmApp.getDbSettings().observe(this) { settings ->
+            settings?.apply {
+                (application as App).repository.settings = this
+            }
+        }
+
         val animation = findViewById<LottieAnimationView>(R.id.animation)
         animation.playAnimation()
 

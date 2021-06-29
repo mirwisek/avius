@@ -185,6 +185,7 @@ class MainActivity : AppCompatActivity(),
         mediaPlayer?.let {
             if (it.isPlaying) {
                 it.stop()
+                it.reset()
                 it.release()
             }
         }

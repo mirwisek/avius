@@ -12,12 +12,9 @@ import kotlinx.coroutines.launch
 
 class QuestionViewModel(val app: Application) : AndroidViewModel(app) {
 
-    private val db = AppDatabase.getInstance(app.applicationContext, viewModelScope)
-
     private val repository = (app as App).repository
-    private val apiQuestions = MutableLiveData(repository.apiResponse?.point?.form?.questions)
     private val repoQuestions = MutableLiveData(repository.questions)
-    val themeColor = repository.themeColor
+    val themeColor = repository.settings?.themeColor ?: ""
 
     val questions = Transformations.map(repoQuestions) { ques ->
         val list = arrayListOf<Question>()

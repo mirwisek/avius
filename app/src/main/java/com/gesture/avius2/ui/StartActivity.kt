@@ -82,11 +82,7 @@ class StartActivity : AppCompatActivity() {
                     result.fold(
                         onSuccess = {
                             vmApp.saveQuestions(it)
-                            log("Saved to DB")
-                            (application as App).repository.apply {
-                                apiResponse = it
-                                themeColor = it.point.form.theme_color
-                            }
+                            vmApp.saveSettings(it)
                             dialogLoading.dismiss()
                             start()
                         },

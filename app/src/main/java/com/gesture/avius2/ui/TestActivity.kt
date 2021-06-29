@@ -40,6 +40,7 @@ class TestActivity : AppCompatActivity(),
         mediaPlayer?.let {
             if(it.isPlaying) {
                 it.stop()
+                it.reset()
                 it.release()
             }
         }

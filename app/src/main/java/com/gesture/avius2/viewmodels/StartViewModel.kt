@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 class StartViewModel(app: Application): AndroidViewModel(app) {
 
     private val repository = (app as App).repository
-    val themeColor = repository.themeColor
+    val themeColor = repository.settings?.themeColor ?: ""
 
     val oldStatus = MutableLiveData<Int>()
     val thumbStatus = MutableLiveData<Int>()
