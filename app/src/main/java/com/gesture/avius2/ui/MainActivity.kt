@@ -2,7 +2,6 @@ package com.gesture.avius2.ui
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
@@ -17,12 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.utils.gone
 import com.gesture.avius2.utils.initReplace
-import com.gesture.avius2.viewmodels.MainViewModel
+import com.gesture.avius2.utils.log
+import com.gesture.avius2.viewmodels.AppViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.mediapipe.components.CameraHelper.CameraFacing
 import com.google.mediapipe.components.CameraXPreviewHelper
@@ -41,7 +40,7 @@ import java.util.*
 class MainActivity : AppCompatActivity(),
     StartFragment.OnThumbDetectionFinishListener,
     QuestionsFragment.OnSurveyCompleteListener,
-    SubscriptionFragment.OnCountDownCompleteListener  {
+    SubscriptionFragment.OnCountDownCompleteListener {
 
     // {@link SurfaceTexture} where the camera-preview frames can be accessed.
     private var previewFrameTexture: SurfaceTexture? = null
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity(),
 
     private val packetListeners = hashMapOf<String, OnPacketListener>()
 
-    private lateinit var vmMain: MainViewModel
+    private lateinit var vmApp: AppViewModel
 
     private var mediaPlayer: MediaPlayer? = null
 
@@ -80,7 +79,7 @@ class MainActivity : AppCompatActivity(),
 
         if (wasAbleToLoadLibrary) {
             setContentView(R.layout.activity_main)
-            vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
+            vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
             val vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
 
             /**
@@ -184,7 +183,7 @@ class MainActivity : AppCompatActivity(),
 
     fun playSound(@RawRes resId: Int) {
         mediaPlayer?.let {
-            if(it.isPlaying) {
+            if (it.isPlaying) {
                 it.stop()
                 it.release()
             }
@@ -378,13 +377,13 @@ class MainActivity : AppCompatActivity(),
 
         init {
             // Load all native libraries needed by the app.
-//            try {
-            System.loadLibrary("mediapipe_jni")
-            System.loadLibrary("opencv_java3")
-//            } catch (e: UnsatisfiedLinkError) {
-//                log("Error $e")
-//                wasAbleToLoadLibrary = false
-//            }
+            try {
+                System.loadLibrary("mediapipe_jni")
+                System.loadLibrary("opencv_java3")
+            } catch (e: UnsatisfiedLinkError) {
+                log("Error $e")
+                wasAbleToLoadLibrary = false
+            }
         }
 
         private const val TAG = "MainActivity"

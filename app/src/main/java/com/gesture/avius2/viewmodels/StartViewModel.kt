@@ -1,14 +1,10 @@
 package com.gesture.avius2.viewmodels
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gesture.avius2.App
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class StartViewModel(app: Application): AndroidViewModel(app) {

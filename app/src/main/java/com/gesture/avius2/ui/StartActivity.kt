@@ -11,12 +11,15 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.App
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.network.ApiHelper
 import com.gesture.avius2.utils.invisible
+import com.gesture.avius2.utils.log
 import com.gesture.avius2.utils.visible
+import com.gesture.avius2.viewmodels.AppViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -63,6 +66,8 @@ class StartActivity : AppCompatActivity() {
             }
         })
 
+        val vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
+
         btnSubmit.setOnClickListener {
 
             if(etCompanyID.text.isNullOrEmpty() || etPointID.text.isNullOrEmpty()) {
@@ -76,8 +81,10 @@ class StartActivity : AppCompatActivity() {
                 ApiHelper.getQuestions(company, pointId) { result ->
                     result.fold(
                         onSuccess = {
+                            vmApp.saveQuestions(it)
+                            log("Saved to DB")
                             (application as App).repository.apply {
-                                questions = it
+                                apiResponse = it
                                 themeColor = it.point.form.theme_color
                             }
                             dialogLoading.dismiss()

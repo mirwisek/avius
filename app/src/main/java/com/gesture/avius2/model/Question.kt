@@ -40,11 +40,12 @@ data class LanguageAnswer(
 data class QuestionMultiLang(
     var english: String = "",
     var arabic: String = "",
+    var absoluteValue: String = ""
 ) {
     companion object {
         fun parse(value: String): QuestionMultiLang {
             val arr = value.split("\r\n")
-            return QuestionMultiLang(arr[0].trim(), arr[1].trim())
+            return QuestionMultiLang(arr[0].trim(), arr[1].trim(), value)
         }
     }
 }

@@ -1,27 +1,28 @@
 package com.gesture.avius2.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import com.gesture.avius2.App
-import com.gesture.avius2.model.Answers
+import com.gesture.avius2.db.AppDatabase
 import com.gesture.avius2.model.Question
-import com.gesture.avius2.model.QuestionMultiLang
-import com.gesture.avius2.utils.log
 import kotlinx.coroutines.launch
 
 class QuestionViewModel(val app: Application) : AndroidViewModel(app) {
 
+    private val db = AppDatabase.getInstance(app.applicationContext, viewModelScope)
+
     private val repository = (app as App).repository
-    private val repoQuestions = MutableLiveData(repository.questions?.point?.form?.questions)
+    private val apiQuestions = MutableLiveData(repository.apiResponse?.point?.form?.questions)
+    private val repoQuestions = MutableLiveData(repository.questions)
     val themeColor = repository.themeColor
 
     val questions = Transformations.map(repoQuestions) { ques ->
         val list = arrayListOf<Question>()
-        var index = 1
         ques?.forEach {
-            val q = QuestionMultiLang.parse(it.question)
-            val ans = Answers.parse(it.answers)
-            list.add(Question(index++, it.id, q, ans.upAnswer, ans.downAnswer))
+            list.add(it.toQuestion())
         }
         list
     }

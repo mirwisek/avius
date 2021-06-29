@@ -8,13 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
-import com.gesture.avius2.utils.findFragmentOrInit
 import com.gesture.avius2.utils.initReplace
-import com.gesture.avius2.utils.log
-import com.gesture.avius2.utils.replace
-import com.gesture.avius2.viewmodels.MainViewModel
+import com.gesture.avius2.viewmodels.AppViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
-import kotlin.math.absoluteValue
 
 
 class TestActivity : AppCompatActivity(),
@@ -22,14 +18,15 @@ class TestActivity : AppCompatActivity(),
     QuestionsFragment.OnSurveyCompleteListener,
     SubscriptionFragment.OnCountDownCompleteListener {
 
-    private lateinit var vmMain: MainViewModel
+    private lateinit var vmApp: AppViewModel
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
+
         val vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
+
         val themeColor = if (vmStart.themeColor.isNotBlank())
             Color.parseColor(vmStart.themeColor)
         else
