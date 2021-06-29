@@ -182,8 +182,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         btnThumbsDown.setOnClickListener {
             proceedNext(-1)
         }
-
-        setupSound()
     }
 
     private fun updateQuestionProgress(value: Int) {
@@ -254,7 +252,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             viewPager.setCurrentItem(next, true)
             handler.postDelayed({
                 shouldTakeInput = true
-                setupSound()
             }, NEXT_QUESTION_DELAY)
         } else {
             vmQuestions.storeAnswers()  // Save ViewModel answers into App's Repository Cache
@@ -285,19 +282,11 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         }
     }
 
-    private fun setupSound(@RawRes resId: Int = R.raw.definite) {
+    private fun playSound(@RawRes resId: Int = R.raw.definite) {
         if(!BuildConfig.DEBUG) {
-            activity.setupSound(resId)
+            activity.playSound(resId)
         } else {
-            activityDebug.setupSound(resId)
-        }
-    }
-
-    private fun playSound() {
-        if(!BuildConfig.DEBUG) {
-            activity.playSound()
-        } else {
-            activityDebug.playSound()
+            activityDebug.playSound(resId)
         }
     }
 

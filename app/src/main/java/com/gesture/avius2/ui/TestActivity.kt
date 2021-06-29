@@ -25,7 +25,6 @@ class TestActivity : AppCompatActivity(),
     private lateinit var vmMain: MainViewModel
     private var mediaPlayer: MediaPlayer? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,10 +37,15 @@ class TestActivity : AppCompatActivity(),
         window.statusBarColor = themeColor
 
         setUpStartFragment()
-
     }
 
-    fun setupSound(@RawRes resId: Int) {
+    fun playSound(@RawRes resId: Int) {
+        mediaPlayer?.let {
+            if(it.isPlaying) {
+                it.stop()
+                it.release()
+            }
+        }
         mediaPlayer = MediaPlayer.create(this, resId).apply {
             setVolume(1F, 1F)   // Set sound to max
             setOnCompletionListener { mp ->
@@ -50,20 +54,15 @@ class TestActivity : AppCompatActivity(),
                 mediaPlayer = null
             }
         }
-    }
-
-    fun playSound() {
         mediaPlayer?.start()
     }
 
     private fun setUpStartFragment() {
         supportFragmentManager.initReplace(StartFragment.TAG) { StartFragment() }
-        // Prepare
-        setupSound(R.raw.accomplished)
     }
 
     private fun setUpQuestionsFragment() {
-        playSound()
+        playSound(R.raw.accomplished)
         supportFragmentManager.initReplace(QuestionsFragment.TAG) { QuestionsFragment() }
     }
 

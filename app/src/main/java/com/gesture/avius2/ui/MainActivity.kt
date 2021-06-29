@@ -180,10 +180,15 @@ class MainActivity : AppCompatActivity(),
                 }
             }.show()
         }
-
     }
 
-    fun setupSound(@RawRes resId: Int = R.raw.definite) {
+    fun playSound(@RawRes resId: Int) {
+        mediaPlayer?.let {
+            if(it.isPlaying) {
+                it.stop()
+                it.release()
+            }
+        }
         mediaPlayer = MediaPlayer.create(this, resId).apply {
             setVolume(1F, 1F)   // Set sound to max
             setOnCompletionListener { mp ->
@@ -192,20 +197,15 @@ class MainActivity : AppCompatActivity(),
                 mediaPlayer = null
             }
         }
-    }
-
-    fun playSound() {
         mediaPlayer?.start()
     }
 
     private fun setUpStartFragment() {
         supportFragmentManager.initReplace(StartFragment.TAG) { StartFragment() }
-        // Prepare
-        setupSound(R.raw.accomplished)
     }
 
     private fun setUpQuestionsFragment() {
-        playSound()
+        playSound(R.raw.accomplished)
         supportFragmentManager.initReplace(QuestionsFragment.TAG) { QuestionsFragment() }
     }
 
