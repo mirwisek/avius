@@ -4,10 +4,28 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.gesture.avius2.R
+import com.gesture.avius2.ui.SubscriptionFragment
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.round
+
+fun FragmentManager.replace(fragment: Fragment, tag: String, container: Int = R.id.fragment_container) {
+    beginTransaction()
+        .replace(container, fragment, tag)
+        .commit()
+}
+
+fun <T : Fragment> FragmentManager.findFragmentOrInit(tag: String, fragment: () -> T): T {
+    return (findFragmentByTag(tag) ?: fragment()) as T
+}
+
+fun <T : Fragment> FragmentManager.initReplace(tag: String, container: Int = R.id.fragment_container, fragment: () -> T) {
+    replace(findFragmentOrInit(tag, fragment), tag, container)
+}
 
 fun log(msg: String, tag: String = "ffnet") {
     Log.i(tag, msg)

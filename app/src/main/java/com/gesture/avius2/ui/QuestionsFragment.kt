@@ -1,6 +1,7 @@
 package com.gesture.avius2.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.os.*
 import android.view.LayoutInflater
@@ -23,6 +24,8 @@ import com.gesture.avius2.viewmodels.QuestionViewModel
 import com.google.mediapipe.formats.proto.LandmarkProto
 
 class QuestionsFragment : Fragment() , OnPacketListener {
+
+    private var surveyCompleteListener: OnSurveyCompleteListener? = null
 
     private lateinit var viewPager: ViewPager2
     private lateinit var quesProgressBar: ProgressBar
@@ -49,6 +52,20 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         const val NEXT_QUESTION_DELAY = 3000L
         // Value after which the thumb status is taken as selected
         const val PROGRESS_APPROVAL_THRESHOLD = 28  // Max Progressbar value is 30
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            surveyCompleteListener = context as OnSurveyCompleteListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement OnSurveyCompleteListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        surveyCompleteListener = null
     }
 
     // Make sure there are no pending callbacks, on Exit
@@ -239,6 +256,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         } else {
             vmQuestions.storeAnswers()  // Save ViewModel answers into App's Repository Cache
             onSurveyDone?.invoke(themeColor)
+            surveyCompleteListener?.onSurveyCompleted(themeColor)
         }
     }
 
@@ -263,5 +281,9 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             handler.removeCallbacksAndMessages(null)
             handler.postDelayed(resetRunnable, 1000L)
         }
+    }
+
+    interface OnSurveyCompleteListener {
+        fun onSurveyCompleted(themeColor: Int)
     }
 }

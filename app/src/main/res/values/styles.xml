@@ -48,6 +48,14 @@
         <item name="android:layout_marginTop">20dp</item>
     </style>
 
+    <style name="RestartTitle" parent="SubscribeTitle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">20dp</item>
+    </style>
+
     <style name="FragmentStartBGStyle">
         <item name="background">@color/bg</item>
         <item name="android:background">@color/bg</item>

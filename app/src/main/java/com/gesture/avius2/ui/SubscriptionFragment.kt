@@ -1,5 +1,7 @@
 package com.gesture.avius2.ui
 
+import android.animation.Animator
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.airbnb.lottie.LottieAnimationView
 import com.gesture.avius2.App
 import com.gesture.avius2.R
 import com.gesture.avius2.utils.log
@@ -16,6 +19,23 @@ import com.gesture.avius2.viewmodels.QuestionViewModel
 class SubscriptionFragment: Fragment() {
 
     private val themeColor: Int? by lazy { arguments?.getInt(KEY_THEME_COLOR) }
+    private var onCountDownFinish: (() -> Unit)? = null
+    private var countDownCompleteListener: OnCountDownCompleteListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            countDownCompleteListener = context as OnCountDownCompleteListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement OnCountDownCompleteListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        countDownCompleteListener = null
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +62,29 @@ class SubscriptionFragment: Fragment() {
         repo.answers.forEach {
             log("${it.index}) Q: ${it.question.english} -- A: ${it.answer}")
         }
+
+        val animation =  view.findViewById<LottieAnimationView>(R.id.animation)
+
+        animation.addAnimatorListener(object: Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animator?) {
+                onCountDownFinish?.invoke()
+                countDownCompleteListener?.onCountDownCompleted()
+            }
+
+            override fun onAnimationCancel(p0: Animator?) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator?) {
+            }
+
+        })
     }
+
+    fun setOnCountDownFinish(callback: (() -> Unit)) { onCountDownFinish = callback }
 
     companion object {
         const val TAG = "SubscriptionFragment"
@@ -56,5 +98,9 @@ class SubscriptionFragment: Fragment() {
             fragment.arguments = args
             return fragment
         }
+    }
+
+    interface OnCountDownCompleteListener {
+        fun onCountDownCompleted()
     }
 }

@@ -1,5 +1,6 @@
 package com.gesture.avius2.ui
 
+import android.content.Context
 import android.graphics.Color
 import android.os.*
 import android.view.LayoutInflater
@@ -23,6 +24,8 @@ import com.google.mediapipe.formats.proto.LandmarkProto
  */
 class StartFragment : Fragment(), OnPacketListener {
 
+    private var thumbFinishListener: OnThumbDetectionFinishListener? = null
+
     private lateinit var vmStart: StartViewModel
     private var countDownTimer: CountDownTimer? = null
     // Callback when the thumb progress completes
@@ -39,6 +42,19 @@ class StartFragment : Fragment(), OnPacketListener {
         const val TICK = 100L
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            thumbFinishListener = context as OnThumbDetectionFinishListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement OnThumbDetectionFinishListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        thumbFinishListener = null
+    }
 
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
@@ -100,13 +116,13 @@ class StartFragment : Fragment(), OnPacketListener {
                 if (countDownTimer == null) {
                     countDownTimer = getCountDownTimer().start()
                 }
-
             }
         }
 
         val gestureButton = view.findViewById<GestureButton>(R.id.gestureButton).apply {
             changeCircleColor(themeColor)
             setOnClickListener {
+                thumbFinishListener?.onStartFragmentFinished()
                 onFinish?.invoke()
             }
         }
@@ -188,5 +204,9 @@ class StartFragment : Fragment(), OnPacketListener {
         handler.removeCallbacksAndMessages(null)
         handler.postDelayed(resetRunnable, 1000L)
 //            log("Packet:: ${handedness.size} and ${handedness[0]}")
+    }
+
+    interface OnThumbDetectionFinishListener {
+        fun onStartFragmentFinished()
     }
 }

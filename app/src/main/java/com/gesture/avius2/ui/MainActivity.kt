@@ -19,6 +19,7 @@ import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.utils.gone
+import com.gesture.avius2.utils.initReplace
 import com.gesture.avius2.viewmodels.MainViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.mediapipe.components.CameraHelper.CameraFacing
@@ -35,7 +36,10 @@ import com.google.mediapipe.glutil.EglManager
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+    StartFragment.OnThumbDetectionFinishListener,
+    QuestionsFragment.OnSurveyCompleteListener,
+    SubscriptionFragment.OnCountDownCompleteListener  {
 
     // {@link SurfaceTexture} where the camera-preview frames can be accessed.
     private var previewFrameTexture: SurfaceTexture? = null
@@ -71,9 +75,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (wasAbleToLoadLibrary) {
-
             setContentView(R.layout.activity_main)
-
             vmMain = ViewModelProvider(this).get(MainViewModel::class.java)
             val vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
 
@@ -86,31 +88,8 @@ class MainActivity : AppCompatActivity() {
                 ContextCompat.getColor(this, R.color.blue_main)
             window.statusBarColor = themeColor
 
-            val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
-                ?: StartFragment()) as StartFragment
-
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
-                .commit()
-
-            val fragmentQuestion = QuestionsFragment()
-
-            fragmentStart.setOnFinish {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
-                    .commit()
-            }
-
-            fragmentQuestion.setOnSurveyComplete { themeColor ->
-                val fragmentSubscription = SubscriptionFragment.newInstance(themeColor)
-                supportFragmentManager.beginTransaction()
-                    .replace(
-                        R.id.fragment_container,
-                        fragmentSubscription,
-                        SubscriptionFragment.TAG
-                    )
-                    .commit()
-            }
+            // The cycle of fragment starts from here
+            setUpStartFragment()
 
             labelText = findViewById(R.id.label)
             labelPoints = findViewById(R.id.points)
@@ -200,6 +179,33 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setUpStartFragment() {
+        supportFragmentManager.initReplace(StartFragment.TAG) { StartFragment() }
+    }
+
+    private fun setUpQuestionsFragment() {
+        supportFragmentManager.initReplace(QuestionsFragment.TAG) { QuestionsFragment() }
+    }
+
+    private fun setUpSubscriptionFragment(themeColor: Int) {
+        supportFragmentManager.initReplace(SubscriptionFragment.TAG) {
+            SubscriptionFragment.newInstance(themeColor)
+        }
+    }
+
+    override fun onStartFragmentFinished() {
+        setUpQuestionsFragment()
+    }
+
+    override fun onSurveyCompleted(themeColor: Int) {
+        setUpSubscriptionFragment(themeColor)
+    }
+
+    // On count down finish, restart with the StartFragment again
+    override fun onCountDownCompleted() {
+        setUpStartFragment()
+    }
+
 //    override fun onConfigurationChanged(newConfig: Configuration) {
 //        super.onConfigurationChanged(newConfig)
 //        // Checks the orientation of the screen
@@ -221,10 +227,6 @@ class MainActivity : AppCompatActivity() {
 
     fun removePacketListener(tag: String) {
         packetListeners.remove(tag)
-    }
-
-    fun onSurveyComplete() {
-
     }
 
     private fun updateLabel(text: String) {

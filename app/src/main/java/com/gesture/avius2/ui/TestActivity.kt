@@ -6,13 +6,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
+import com.gesture.avius2.utils.findFragmentOrInit
+import com.gesture.avius2.utils.initReplace
+import com.gesture.avius2.utils.replace
 import com.gesture.avius2.viewmodels.MainViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
 
 
-class TestActivity : AppCompatActivity() {
+class TestActivity : AppCompatActivity(),
+    StartFragment.OnThumbDetectionFinishListener,
+    QuestionsFragment.OnSurveyCompleteListener,
+    SubscriptionFragment.OnCountDownCompleteListener {
 
     private lateinit var vmMain: MainViewModel
+    private lateinit var fragmentStart: StartFragment
+    private lateinit var fragmentQuestions: QuestionsFragment
+    private lateinit var fragmentSubscription: SubscriptionFragment
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,36 +35,34 @@ class TestActivity : AppCompatActivity() {
             ContextCompat.getColor(this, R.color.blue_main)
         window.statusBarColor = themeColor
 
-        val fragmentStart = (supportFragmentManager.findFragmentByTag(StartFragment.TAG)
-            ?: StartFragment()) as StartFragment
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragmentStart, StartFragment.TAG)
-            .commit()
-
-        val fragmentQuestion = QuestionsFragment()
-
-        fragmentStart.setOnFinish {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragmentQuestion, QuestionsFragment.TAG)
-                .commit()
-        }
-
-        fragmentQuestion.setOnSurveyComplete { themeColor ->
-            val fragmentSubscription = SubscriptionFragment.newInstance(themeColor)
-            supportFragmentManager.beginTransaction()
-                .replace(
-                    R.id.fragment_container,
-                    fragmentSubscription,
-                    SubscriptionFragment.TAG
-                )
-                .commit()
-        }
+        setUpStartFragment()
 
     }
 
-    fun onSurveyComplete() {
+    private fun setUpStartFragment() {
+        supportFragmentManager.initReplace(StartFragment.TAG) { StartFragment() }
+    }
 
+    private fun setUpQuestionsFragment() {
+        supportFragmentManager.initReplace(QuestionsFragment.TAG) { QuestionsFragment() }
+    }
+
+    private fun setUpSubscriptionFragment(themeColor: Int) {
+        supportFragmentManager.initReplace(SubscriptionFragment.TAG) {
+            SubscriptionFragment.newInstance(themeColor)
+        }
+    }
+
+    override fun onStartFragmentFinished() {
+        setUpQuestionsFragment()
+    }
+
+    override fun onSurveyCompleted(themeColor: Int) {
+        setUpSubscriptionFragment(themeColor)
+    }
+
+    override fun onCountDownCompleted() {
+        setUpStartFragment()
     }
 
 }
