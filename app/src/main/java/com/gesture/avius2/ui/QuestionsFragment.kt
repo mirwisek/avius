@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.RawRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.size
@@ -26,13 +27,13 @@ import com.google.mediapipe.formats.proto.LandmarkProto
 class QuestionsFragment : Fragment() , OnPacketListener {
 
     private var surveyCompleteListener: OnSurveyCompleteListener? = null
+    private lateinit var activity: MainActivity
+    private lateinit var activityDebug: TestActivity
 
     private lateinit var viewPager: ViewPager2
     private lateinit var quesProgressBar: ProgressBar
     private lateinit var tvThumbUp: TextView
     private lateinit var tvThumbDown: TextView
-
-    private var onSurveyDone: ((themeColor: Int) -> Unit)? = null
 
     private lateinit var vmQuestions: QuestionViewModel
     private var countDownTimer: CountDownTimer? = null
@@ -142,8 +143,11 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         handler = Handler(Looper.getMainLooper())
 
         if(!BuildConfig.DEBUG) {
+            activity = requireActivity() as MainActivity
             // Start Listening to packets
-            (requireActivity() as MainActivity).setPacketListener(this, TAG)
+            activity.setPacketListener(this, TAG)
+        } else {
+            activityDebug = requireActivity() as TestActivity
         }
 
         // Enable input after delay, give user a chance to read the question
@@ -179,9 +183,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             proceedNext(-1)
         }
 
+        setupSound()
     }
-
-    fun setOnSurveyComplete(callback: ((themeColor: Int) -> Unit)) { onSurveyDone = callback }
 
     private fun updateQuestionProgress(value: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -196,7 +199,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             override fun onTick(millisUntilFinished: Long) {
                 updateCounter()
             }
-
             override fun onFinish() { }
         }
     }
@@ -244,18 +246,18 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     }
 
     private fun nextQuestion() {
+        playSound()
         shouldTakeInput = false
-        // TODO: If app crashes then adjust back in if-else clause
         val next = viewPager.currentItem + 1
         if(next < adapter.itemCount) {
             vmQuestions.nextQuestion()
             viewPager.setCurrentItem(next, true)
             handler.postDelayed({
                 shouldTakeInput = true
+                setupSound()
             }, NEXT_QUESTION_DELAY)
         } else {
             vmQuestions.storeAnswers()  // Save ViewModel answers into App's Repository Cache
-            onSurveyDone?.invoke(themeColor)
             surveyCompleteListener?.onSurveyCompleted(themeColor)
         }
     }
@@ -280,6 +282,22 @@ class QuestionsFragment : Fragment() , OnPacketListener {
             // otherwise if hand leaves the frame then resetRunnable will be called
             handler.removeCallbacksAndMessages(null)
             handler.postDelayed(resetRunnable, 1000L)
+        }
+    }
+
+    private fun setupSound(@RawRes resId: Int = R.raw.definite) {
+        if(!BuildConfig.DEBUG) {
+            activity.setupSound(resId)
+        } else {
+            activityDebug.setupSound(resId)
+        }
+    }
+
+    private fun playSound() {
+        if(!BuildConfig.DEBUG) {
+            activity.playSound()
+        } else {
+            activityDebug.playSound()
         }
     }
 

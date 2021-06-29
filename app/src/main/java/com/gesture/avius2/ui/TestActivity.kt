@@ -1,16 +1,20 @@
 package com.gesture.avius2.ui
 
 import android.graphics.Color
+import android.media.MediaPlayer
 import android.os.Bundle
+import androidx.annotation.RawRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.utils.findFragmentOrInit
 import com.gesture.avius2.utils.initReplace
+import com.gesture.avius2.utils.log
 import com.gesture.avius2.utils.replace
 import com.gesture.avius2.viewmodels.MainViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
+import kotlin.math.absoluteValue
 
 
 class TestActivity : AppCompatActivity(),
@@ -19,9 +23,7 @@ class TestActivity : AppCompatActivity(),
     SubscriptionFragment.OnCountDownCompleteListener {
 
     private lateinit var vmMain: MainViewModel
-    private lateinit var fragmentStart: StartFragment
-    private lateinit var fragmentQuestions: QuestionsFragment
-    private lateinit var fragmentSubscription: SubscriptionFragment
+    private var mediaPlayer: MediaPlayer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,11 +41,29 @@ class TestActivity : AppCompatActivity(),
 
     }
 
+    fun setupSound(@RawRes resId: Int) {
+        mediaPlayer = MediaPlayer.create(this, resId).apply {
+            setVolume(1F, 1F)   // Set sound to max
+            setOnCompletionListener { mp ->
+                mp.reset()
+                mp.release()
+                mediaPlayer = null
+            }
+        }
+    }
+
+    fun playSound() {
+        mediaPlayer?.start()
+    }
+
     private fun setUpStartFragment() {
         supportFragmentManager.initReplace(StartFragment.TAG) { StartFragment() }
+        // Prepare
+        setupSound(R.raw.accomplished)
     }
 
     private fun setUpQuestionsFragment() {
+        playSound()
         supportFragmentManager.initReplace(QuestionsFragment.TAG) { QuestionsFragment() }
     }
 

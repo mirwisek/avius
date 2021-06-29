@@ -5,12 +5,14 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.SurfaceTexture
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.RawRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -69,6 +71,8 @@ class MainActivity : AppCompatActivity(),
     private val packetListeners = hashMapOf<String, OnPacketListener>()
 
     private lateinit var vmMain: MainViewModel
+
+    private var mediaPlayer: MediaPlayer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,11 +183,29 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+    fun setupSound(@RawRes resId: Int = R.raw.definite) {
+        mediaPlayer = MediaPlayer.create(this, resId).apply {
+            setVolume(1F, 1F)   // Set sound to max
+            setOnCompletionListener { mp ->
+                mp.reset()
+                mp.release()
+                mediaPlayer = null
+            }
+        }
+    }
+
+    fun playSound() {
+        mediaPlayer?.start()
+    }
+
     private fun setUpStartFragment() {
         supportFragmentManager.initReplace(StartFragment.TAG) { StartFragment() }
+        // Prepare
+        setupSound(R.raw.accomplished)
     }
 
     private fun setUpQuestionsFragment() {
+        playSound()
         supportFragmentManager.initReplace(QuestionsFragment.TAG) { QuestionsFragment() }
     }
 
