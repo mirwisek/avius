@@ -13,13 +13,18 @@ import androidx.lifecycle.ViewModelProvider
 import com.airbnb.lottie.LottieAnimationView
 import com.gesture.avius2.App
 import com.gesture.avius2.R
+import com.gesture.avius2.network.ApiHelper
+import com.gesture.avius2.network.models.AnswerResponse
 import com.gesture.avius2.utils.log
+import com.gesture.avius2.utils.visible
 import com.gesture.avius2.viewmodels.QuestionViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SubscriptionFragment: Fragment() {
 
     private val themeColor: Int? by lazy { arguments?.getInt(KEY_THEME_COLOR) }
-    private var onCountDownFinish: (() -> Unit)? = null
     private var countDownCompleteListener: OnCountDownCompleteListener? = null
 
     override fun onAttach(context: Context) {
@@ -44,7 +49,6 @@ class SubscriptionFragment: Fragment() {
         // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_subscription, container, false)
 
-
         v.findViewById<ImageView>(R.id.imageDone).apply {
             themeColor?.let { drawable.setTint(it) }
         }
@@ -63,6 +67,30 @@ class SubscriptionFragment: Fragment() {
             log("${it.index}) Q: ${it.question.english} -- A: ${it.answer}")
         }
 
+        ApiHelper.submitAnswer(repo.answers, object: Callback<AnswerResponse> {
+
+            override fun onResponse(
+                call: Call<AnswerResponse>,
+                response: Response<AnswerResponse>
+            ) {
+                var isSuccess = false
+                response.body()?.let {
+                    if(it.status.contentEquals("success")) {
+                        isSuccess = true
+                    }
+                }
+                if(isSuccess)
+                    log("Answers submitted successfully")
+                else
+                    log("Answers couldn't be submitted ${response.code()}")
+            }
+
+            override fun onFailure(call: Call<AnswerResponse>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
+
         val animation =  view.findViewById<LottieAnimationView>(R.id.animation)
 
         animation.addAnimatorListener(object: Animator.AnimatorListener {
@@ -71,7 +99,6 @@ class SubscriptionFragment: Fragment() {
             }
 
             override fun onAnimationEnd(p0: Animator?) {
-                onCountDownFinish?.invoke()
                 countDownCompleteListener?.onCountDownCompleted()
             }
 
@@ -83,8 +110,6 @@ class SubscriptionFragment: Fragment() {
 
         })
     }
-
-    fun setOnCountDownFinish(callback: (() -> Unit)) { onCountDownFinish = callback }
 
     companion object {
         const val TAG = "SubscriptionFragment"

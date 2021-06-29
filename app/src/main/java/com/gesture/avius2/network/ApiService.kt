@@ -12,7 +12,7 @@ interface ApiService {
     @POST("/api/questions/11")
     fun getQuestions(@Body body: RequestBody): Call<ResponseData>
 
-    @POST("/api/answers/12")
+    @POST("/api/answers/7")
     fun submitAnswer(@Body body: RequestBody): Call<AnswerResponse>
 
 }
