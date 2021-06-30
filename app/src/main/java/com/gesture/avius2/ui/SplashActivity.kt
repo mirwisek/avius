@@ -19,6 +19,8 @@ class SplashActivity : AppCompatActivity() {
 
         val vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
 
+        window.statusBarColor = (application as App).themeColor
+
         var intent = Intent(this, StartActivity::class.java)
         // Database is pre-filled then no need to fetch data from API
         vmApp.getDbQuestions().observe(this) { questions ->
@@ -35,11 +37,6 @@ class SplashActivity : AppCompatActivity() {
             settings?.let {
                 (application as App).apply {
                     repository.settings = it
-                    themeColor = if(it.themeColor.isNotBlank())
-                        Color.parseColor(it.themeColor)
-                    else
-                        ContextCompat.getColor(applicationContext, R.color.blue_main)
-                    window.statusBarColor = themeColor
                 }
             }
         }

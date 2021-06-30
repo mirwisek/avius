@@ -1,17 +1,21 @@
 package com.gesture.avius2.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.gesture.avius2.R
-import com.gesture.avius2.ui.SubscriptionFragment
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.round
+
+val Context.sharedPrefs: SharedPreferences
+    get() {
+        return getSharedPreferences("avius.touchless.ui.shared-prefs", Context.MODE_PRIVATE)
+    }
 
 fun FragmentManager.replace(fragment: Fragment, tag: String, container: Int = R.id.fragment_container) {
     beginTransaction()

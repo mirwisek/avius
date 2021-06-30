@@ -32,6 +32,7 @@ class StartActivity : AppCompatActivity() {
         setContentView(R.layout.activity_start)
 
         val vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
+        window.statusBarColor = (application as App).themeColor
 
         val etCompanyID = findViewById<TextInputEditText>(R.id.etCompanyID)
         val etPointID = findViewById<TextInputEditText>(R.id.etPointID)

@@ -1,9 +1,11 @@
 package com.gesture.avius2.viewmodels
 
 import android.app.Application
+import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gesture.avius2.App
+import com.gesture.avius2.KEY_THEME
 import com.gesture.avius2.db.AppDatabase
 import com.gesture.avius2.db.QuestionEntity
 import com.gesture.avius2.db.SettingsEntity
@@ -12,6 +14,7 @@ import com.gesture.avius2.model.Question
 import com.gesture.avius2.model.QuestionMultiLang
 import com.gesture.avius2.network.models.ResponseData
 import com.gesture.avius2.utils.log
+import com.gesture.avius2.utils.sharedPrefs
 import kotlinx.coroutines.launch
 
 class AppViewModel(val app: Application): AndroidViewModel(app) {
@@ -38,7 +41,12 @@ class AppViewModel(val app: Application): AndroidViewModel(app) {
 
     fun saveSettings(data: ResponseData) {
         viewModelScope.launch {
-            val entity = SettingsEntity(data.point.form.theme_color, data.logo)
+            val theme = data.point.form.theme_color
+            // Save into shared prefs for fast retrieval
+            app.applicationContext.sharedPrefs.edit(true) {
+                putString(KEY_THEME, theme)
+            }
+            val entity = SettingsEntity(theme, data.logo)
             (app as App).repository.settings = entity
             db.settingsDao().insert(entity)
         }
