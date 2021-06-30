@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
+import com.airbnb.lottie.BuildConfig
 import com.gesture.avius2.App
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
@@ -111,8 +112,10 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun start() {
-//        val intent = Intent(this, MainActivity::class.java)
-        val intent = Intent(this, TestActivity::class.java)
+        val intent = if(BuildConfig.DEBUG)
+            Intent(this, TestActivity::class.java)
+        else
+            Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
     }
