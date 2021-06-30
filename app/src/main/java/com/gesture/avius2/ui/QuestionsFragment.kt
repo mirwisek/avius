@@ -2,6 +2,8 @@ package com.gesture.avius2.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RawRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
@@ -96,6 +99,25 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         val fragments = arrayListOf<QuestionHolderFragment>()
         adapter = QuestionsPagerAdapter(lifecycle, childFragmentManager)
         viewPager.adapter = adapter
+
+        /**
+         * Customize Questions ProgressBar thickness & margins
+         * innerRadiusRatio: Lower value keeps the progress away from center
+         * thicknessRatio: Lower value means fat line
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val progressDrawable = quesProgressBar.progressDrawable as LayerDrawable
+            val dProgress = progressDrawable.findDrawableByLayerId(android.R.id.progress) as GradientDrawable
+            val dSecondary = progressDrawable.findDrawableByLayerId(android.R.id.secondaryProgress) as GradientDrawable
+            val ratios = Pair(20F, 2.2F)
+            dProgress.thicknessRatio = ratios.first
+            dProgress.innerRadiusRatio = ratios.second
+
+            dSecondary.thicknessRatio = ratios.first
+            dSecondary.innerRadiusRatio = ratios.second
+            quesProgressBar.invalidate()
+        }
+
 
         vmQuestions.questions.observe(viewLifecycleOwner) {
             it?.let { list ->

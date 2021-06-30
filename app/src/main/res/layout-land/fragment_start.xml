@@ -70,7 +70,6 @@
         app:thumbDrawable="@drawable/ic_thumb_up"
         app:layoutPadding="4dp"
         app:marginCircle="1dp"
-        app:marginProgress="34dp"
         app:thumbPadding="@dimen/p_thumb_up_btn"
         app:layout_constraintStart_toStartOf="@id/gStart"
         app:layout_constraintEnd_toEndOf="@id/gEnd"

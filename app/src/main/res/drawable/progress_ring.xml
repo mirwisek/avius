@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@android:id/secondaryProgress">
+    <item android:id="@android:id/secondaryProgress" >
         <shape
             android:shape="ring"
             android:useLevel="true"
-            android:thicknessRatio="25"
-            android:innerRadiusRatio="2.5">
-            <corners android:radius="3dp"/>
+            android:thicknessRatio="40"
+            android:innerRadiusRatio="12">
             <solid android:color="@color/teal_lighter"/>
         </shape>
     </item>
@@ -15,9 +14,8 @@
         <shape
             android:shape="ring"
             android:useLevel="true"
-            android:thicknessRatio="25"
-            android:innerRadiusRatio="2.5">
-            <corners android:radius="3dp"/>
+            android:thicknessRatio="40"
+            android:innerRadiusRatio="2">
             <solid android:color="@color/teal_light"/>
         </shape>
     </item>

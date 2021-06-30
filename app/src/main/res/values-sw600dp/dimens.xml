@@ -27,7 +27,7 @@
     <dimen name="fab_icon_size_f_start">60dp</dimen>
     <dimen name="fab_size_f_start">80dp</dimen>
     <dimen name="p_thumb_up_f_start">80dp</dimen>
-    <dimen name="p_thumb_up_btn">70dp</dimen>
+    <dimen name="p_thumb_up_btn">100dp</dimen>
     <dimen name="size_logo_f_question">60dp</dimen>
     <dimen name="fab_question_size">80dp</dimen>
     <dimen name="p_question_f_q">20dp</dimen>

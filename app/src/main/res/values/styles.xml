@@ -24,7 +24,6 @@
         <item name="android:layout_height">160dp</item>
         <item name="layoutPadding">5dp</item>
         <item name="marginCircle">@dimen/margin_circle_f_question</item>
-        <item name="marginProgress">4dp</item>
         <item name="thumbPadding">@dimen/thumb_padding_gesture_btn_f_question</item>
         <item name="layout_constraintVertical_bias">0.6</item>
     </style>
