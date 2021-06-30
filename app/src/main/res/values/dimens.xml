@@ -3,8 +3,10 @@
     <dimen name="ml_login_card">30dp</dimen>
     <dimen name="mt_login_card">90dp</dimen>
     <dimen name="ml_login_card_internal">40dp</dimen>
-    <dimen name="mt_login_card_internal">20dp</dimen>
-    <dimen name="mb_login_card_internal">30dp</dimen>
+    <dimen name="mt_login_card_internal">10dp</dimen>
+    <dimen name="mb_login_card_internal">20dp</dimen>
+    <dimen name="ml_subscription_card">40dp</dimen>
+    <dimen name="mt_subscription_card">10dp</dimen>
     <dimen name="mt_company_id">20dp</dimen>
     <dimen name="mt_point_id">10dp</dimen>
     <dimen name="min_height_btn">30dp</dimen>
@@ -21,9 +23,9 @@
     <dimen name="logo_max_width">100dp</dimen>
     <dimen name="logo_min_width">20dp</dimen>
     <dimen name="logo_min_height">20dp</dimen>
-    <dimen name="dialog_icon_size">60dp</dimen>
-    <dimen name="dialog_fab_size">80dp</dimen>
-    <dimen name="dialog_msg_size">20sp</dimen>
+    <dimen name="dialog_icon_size">40dp</dimen>
+    <dimen name="dialog_fab_size">60dp</dimen>
+    <dimen name="dialog_msg_size">16sp</dimen>
     <dimen name="fab_icon_size_f_start">30dp</dimen>
     <dimen name="fab_size_f_start">50dp</dimen>
     <dimen name="p_thumb_up_f_start">40dp</dimen>

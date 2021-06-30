@@ -2,37 +2,37 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/bg"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.circularreveal.cardview.CircularRevealCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.6"
         app:cardCornerRadius="30dp"
-        app:cardElevation="3dp">
+        app:cardElevation="4dp" >
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:minWidth="200dp"
-            android:minHeight="200dp"
-            android:layout_marginStart="@dimen/ml_login_card_internal"
-            android:layout_marginEnd="@dimen/ml_login_card_internal"
-            android:layout_marginTop="@dimen/mt_login_card_internal"
-            android:layout_marginBottom="@dimen/mb_login_card_internal"
+            android:minWidth="350dp"
+            android:minHeight="100dp"
+            android:layout_marginStart="@dimen/ml_subscription_card"
+            android:layout_marginEnd="@dimen/ml_subscription_card"
+            android:layout_marginTop="@dimen/mt_subscription_card"
+            android:layout_marginBottom="@dimen/mt_subscription_card"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imageDone"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="30dp"
                 android:src="@drawable/ic_done"
                 android:maxHeight="200dp"
@@ -48,7 +48,6 @@
             <TextView
                 android:id="@+id/textSubscription"
                 style="@style/SubscribeTitle"
-                android:textSize="20sp"
                 android:text="Thanks for subscribing!"/>
 
             <TextView
@@ -58,9 +57,9 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animation"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_margin="20dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
                 app:lottie_autoPlay="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -71,4 +70,6 @@
 
         </LinearLayout>
     </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
