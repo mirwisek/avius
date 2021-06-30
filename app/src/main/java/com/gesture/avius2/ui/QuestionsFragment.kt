@@ -2,7 +2,6 @@ package com.gesture.avius2.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
@@ -10,25 +9,20 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RawRes
-import androidx.core.content.ContextCompat
-import androidx.core.view.marginBottom
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.gesture.avius2.App
-import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
-import com.gesture.avius2.utils.log
 import com.gesture.avius2.viewmodels.QuestionViewModel
 import com.google.mediapipe.formats.proto.LandmarkProto
 
 class QuestionsFragment : Fragment() , OnPacketListener {
 
     private var surveyCompleteListener: OnSurveyCompleteListener? = null
-    private lateinit var activity: MainActivity
+    private var mainActivity: MainActivity? = null
     private lateinit var activityDebug: TestActivity
 
     private lateinit var viewPager: ViewPager2
@@ -73,10 +67,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
-        if(!BuildConfig.DEBUG) {
-            // Safely Remove callbacks
-            (requireActivity() as MainActivity).removePacketListener(TAG)
-        }
+        // Safely Remove callbacks
+        mainActivity?.removePacketListener(TAG)
         super.onDestroy()
     }
 
@@ -136,12 +128,13 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
         handler = Handler(Looper.getMainLooper())
 
-        if(!BuildConfig.DEBUG) {
-            activity = requireActivity() as MainActivity
-            // Start Listening to packets
-            activity.setPacketListener(this, TAG)
-        } else {
-            activityDebug = requireActivity() as TestActivity
+        requireActivity().apply {
+            if(this is MainActivity) {
+                // Start Listening to packets
+                mainActivity = this
+                mainActivity!!.setPacketListener(this@QuestionsFragment, TAG)
+            } else if(this is TestActivity)
+                activityDebug = this
         }
 
         // Enable input after delay, give user a chance to read the question
@@ -277,10 +270,10 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     }
 
     private fun playSound(@RawRes resId: Int = R.raw.definite) {
-        if(!BuildConfig.DEBUG) {
-            activity.playSound(resId)
-        } else {
+        if(mainActivity == null) {
             activityDebug.playSound(resId)
+        } else {
+            mainActivity!!.playSound(resId)
         }
     }
 

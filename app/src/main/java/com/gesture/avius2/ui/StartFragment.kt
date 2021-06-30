@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.App
-import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
@@ -61,9 +60,11 @@ class StartFragment : Fragment(), OnPacketListener {
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
-        if(!BuildConfig.DEBUG) {
-            // Safely Remove callbacks
-            (requireActivity() as MainActivity).removePacketListener(TAG)
+        requireActivity().apply {
+            if(this is MainActivity) {
+                // Start Listening to packets
+                this.removePacketListener(TAG)
+            }
         }
         super.onDestroy()
     }
@@ -84,9 +85,11 @@ class StartFragment : Fragment(), OnPacketListener {
         themeColor = (requireActivity().application as App).themeColor
 
         // Don't initialize in tablet testing mode
-        if(!BuildConfig.DEBUG) {
-            // Start Listening to packets
-            (requireActivity() as MainActivity).setPacketListener(this, TAG)
+        requireActivity().apply {
+            if(this is MainActivity) {
+                // Start Listening to packets
+                this.setPacketListener(this@StartFragment, TAG)
+            }
         }
         /**
          * Setup Exit Dialog

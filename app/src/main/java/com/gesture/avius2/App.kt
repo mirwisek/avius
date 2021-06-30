@@ -16,6 +16,7 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
 
+
         sharedPrefs.getString(KEY_THEME, null)?.let {
             themeColor = Color.parseColor(it)
         }

@@ -12,13 +12,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
-import com.airbnb.lottie.BuildConfig
 import com.gesture.avius2.App
+import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.network.ApiHelper
 import com.gesture.avius2.utils.invisible
-import com.gesture.avius2.utils.log
 import com.gesture.avius2.utils.visible
 import com.gesture.avius2.viewmodels.AppViewModel
 import com.google.android.material.button.MaterialButton
@@ -112,7 +111,8 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun start() {
-        val intent = if(BuildConfig.DEBUG)
+        // Custom variable DEBUG_MODE in BuildGradle
+        val intent = if(BuildConfig.DEBUG_MODE)
             Intent(this, TestActivity::class.java)
         else
             Intent(this, MainActivity::class.java)
