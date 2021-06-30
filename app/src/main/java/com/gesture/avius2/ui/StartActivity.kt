@@ -31,6 +31,8 @@ class StartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
+        val vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
+
         val etCompanyID = findViewById<TextInputEditText>(R.id.etCompanyID)
         val etPointID = findViewById<TextInputEditText>(R.id.etPointID)
         val btnSubmit = findViewById<MaterialButton>(R.id.btnSubmit)
@@ -44,6 +46,7 @@ class StartActivity : AppCompatActivity() {
             errorView.invisible()
         }
 
+        // Set underlined style for error text
         val textKeepCalm = findViewById<TextView>(R.id.keepCalm)
         textKeepCalm.text = SpannableString(textKeepCalm.text).apply {
             setSpan(UnderlineSpan(), 0, length, 0)
@@ -66,7 +69,6 @@ class StartActivity : AppCompatActivity() {
             }
         })
 
-        val vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
 
         btnSubmit.setOnClickListener {
 

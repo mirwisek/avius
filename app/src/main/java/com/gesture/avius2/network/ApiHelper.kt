@@ -51,4 +51,14 @@ object ApiHelper {
 
         service.submitAnswer(requestBody).enqueue(callback)
     }
+
+    fun logout(email: String, password: String, callback: Callback<AnswerResponse>) {
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM).apply {
+                addFormDataPart("email", email)
+                addFormDataPart("password", password)
+            }.build()
+
+        service.logout(requestBody).enqueue(callback)
+    }
 }

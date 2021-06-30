@@ -1,12 +1,11 @@
 package com.gesture.avius2.ui
 
 import android.content.Context
-import android.graphics.Color
+import android.content.Intent
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.App
@@ -14,6 +13,8 @@ import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
+import com.gesture.avius2.customui.LoginDialog
+import com.gesture.avius2.utils.log
 import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -94,7 +95,8 @@ class StartFragment : Fragment(), OnPacketListener {
             val v = layoutInflater.inflate(R.layout.layout_dialog_logout, parent)
 
             v.findViewById<MaterialButton>(R.id.btn_yes).setOnClickListener {
-                exitApp()
+                dialog.dismiss()
+                showLogin()
             }
             v.findViewById<MaterialButton>(R.id.btn_no).setOnClickListener {
                 dialog.dismiss()
@@ -135,8 +137,6 @@ class StartFragment : Fragment(), OnPacketListener {
         }
 
     }
-
-    fun setOnFinish(callback: (() -> Unit)) { onFinish = callback }
 
     private fun getCountDownTimer(): CountDownTimer {
         return object : CountDownTimer(TIMER_COUNT, TICK) {
@@ -185,8 +185,27 @@ class StartFragment : Fragment(), OnPacketListener {
         vmStart.progressBar.value = 0
     }
 
-    private fun exitApp() {
-        requireActivity().finish()
+    private fun showLogin() {
+        val loginDialog = LoginDialog().apply {
+            setOnLoginError {
+                // Do nothing fancy
+            }
+            setOnLoginSuccess { errorMsg ->
+                // Proceed if there are no error messages
+                if(errorMsg == null) {
+                    vmStart.deleteData { logout() }
+                }
+            }
+        }
+        loginDialog.showNow(childFragmentManager, LoginDialog.TAG)
+    }
+
+    private fun logout() {
+        requireActivity().apply {
+            val intent = Intent(this, SplashActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onLandmarkPacket(direction: Int) {

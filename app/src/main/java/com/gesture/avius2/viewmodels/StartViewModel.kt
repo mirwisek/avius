@@ -5,9 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gesture.avius2.App
+import com.gesture.avius2.db.AppDatabase
 import kotlinx.coroutines.launch
 
 class StartViewModel(app: Application): AndroidViewModel(app) {
+
+    private val db = AppDatabase.getInstance(app, viewModelScope)
 
     private val repository = (app as App).repository
     val themeColor = repository.settings?.themeColor ?: ""
@@ -39,6 +42,14 @@ class StartViewModel(app: Application): AndroidViewModel(app) {
                 hasValueChanged.value = true
             oldStatus.value = thumbStatus.value
             thumbStatus.value = thumbDir
+        }
+    }
+
+    fun deleteData(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+//            db.settingsDao().deleteAll()  // DOn't delete settings since new data will replace older one
+            db.questionsDao().deleteAll()
+            onDeleted()
         }
     }
 

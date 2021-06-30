@@ -15,6 +15,7 @@
         app:collapsedSize="@dimen/dialog_fab_size"
         app:icon="@drawable/ic_power"
         app:iconSize="@dimen/dialog_icon_size"
+        android:layout_marginTop="10dp"
         app:iconTint="@color/teal_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
