@@ -33,6 +33,9 @@ class StartFragment : Fragment(), OnPacketListener {
     private val resetRunnable = {
         resetCounter()
     }
+
+    // A variable to disable input while a dialog is in focus and waiting client input
+    private var shouldTakeInput = false
     private var themeColor: Int = -1
 
     companion object {
@@ -90,9 +93,9 @@ class StartFragment : Fragment(), OnPacketListener {
             }
         }
         /**
-         * Setup Exit Dialog
+         * Setup Logout Dialog
          */
-        val dialogExit = CustomDialog(requireContext()) { parent, dialog ->
+        val dialogLogout = CustomDialog(requireContext()) { parent, dialog ->
             val v = layoutInflater.inflate(R.layout.layout_dialog_logout, parent)
 
             v.findViewById<MaterialButton>(R.id.btn_yes).setOnClickListener {
@@ -101,11 +104,13 @@ class StartFragment : Fragment(), OnPacketListener {
             }
             v.findViewById<MaterialButton>(R.id.btn_no).setOnClickListener {
                 dialog.dismiss()
+                shouldTakeInput = true
             }
         }
 
         view.findViewById<ExtendedFloatingActionButton>(R.id.fabPower).setOnClickListener {
-            dialogExit.show()
+            shouldTakeInput = false
+            dialogLogout.show()
         }
 
         /**
@@ -136,12 +141,15 @@ class StartFragment : Fragment(), OnPacketListener {
             }
         }
 
+        // Start taking input
+        shouldTakeInput = true
     }
 
     private fun getCountDownTimer(): CountDownTimer {
         return object : CountDownTimer(TIMER_COUNT, TICK) {
             override fun onTick(millisUntilFinished: Long) {
-                updateCounter()
+                if(shouldTakeInput)
+                    updateCounter()
             }
 
             override fun onFinish() { }
@@ -187,15 +195,23 @@ class StartFragment : Fragment(), OnPacketListener {
     private fun showLogin() {
         val loginDialog = LoginDialog().apply {
             setOnLoginError {
-                // Do nothing fancy
+                // Do nothing
             }
             setOnLoginSuccess { errorMsg ->
                 // Proceed if there are no error messages
                 if(errorMsg == null) {
+                    // It is going to logout no need to set shouldTakeInput
                     vmStart.deleteData { logout() }
                 }
             }
+            // When user clicks on side to dismiss, we need to restore shouldTakeInput
+            setOnDismiss { isScheduledLogout ->
+                if(!isScheduledLogout) {
+                    shouldTakeInput = true
+                }
+            }
         }
+        shouldTakeInput = false
         loginDialog.showNow(childFragmentManager, LoginDialog.TAG)
     }
 

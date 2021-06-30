@@ -1,5 +1,6 @@
 package com.gesture.avius2.customui
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -23,8 +24,11 @@ class LoginDialog() : DialogFragment() {
 
     private var successListener: ((errorMessage: String?) -> Unit)? = null
     private var errorListener: ((t: Throwable) -> Unit)? = null
+    private var dismissListener: ((isScheduledLogout: Boolean) -> Unit)? = null
 
     private var textError: TextView? = null
+
+    private var isScheduledLogout = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +66,10 @@ class LoginDialog() : DialogFragment() {
             } else if(etEmail.error == null && etPassword.error == null) {
                 val email = etEmail.text.toString()
                 val password = etPassword.text.toString()
+                /**
+                 * IF users dismiss from this moment, parent will know there is possibility of logout
+                 */
+                isScheduledLogout = true
                 authenticate(email, password)
             }
         }
@@ -91,16 +99,24 @@ class LoginDialog() : DialogFragment() {
                 else
                     errorListener?.invoke(Throwable("Couldn't logout, error ${response.code()}"))
                 textError?.text = msg
+                isScheduledLogout = false   // Reset value
             }
 
             override fun onFailure(call: Call<AnswerResponse>, t: Throwable) {
                 errorListener?.invoke(t)
                 t.printStackTrace()
+                isScheduledLogout = false   // Reset value
             }
 
         })
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        dismissListener?.invoke(isScheduledLogout)
+    }
+
+    fun setOnDismiss(onDismiss: (isScheduledLogout: Boolean) -> Unit) { dismissListener = onDismiss }
     fun setOnLoginError(onError: (t: Throwable) -> Unit) { errorListener = onError }
     fun setOnLoginSuccess(onSuccess: (errorMessage: String?) -> Unit) { successListener = onSuccess }
 
