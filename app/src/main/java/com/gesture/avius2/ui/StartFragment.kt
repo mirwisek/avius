@@ -29,8 +29,6 @@ class StartFragment : Fragment(), OnPacketListener {
 
     private lateinit var vmStart: StartViewModel
     private var countDownTimer: CountDownTimer? = null
-    // Callback when the thumb progress completes
-    private var onFinish: (() -> Unit)? = null
     private lateinit var handler: Handler
     private val resetRunnable = {
         resetCounter()
@@ -126,7 +124,6 @@ class StartFragment : Fragment(), OnPacketListener {
             changeCircleColor(themeColor)
             setOnClickListener {
                 thumbFinishListener?.onStartFragmentFinished()
-                onFinish?.invoke()
             }
         }
         val progressBar = gestureButton.progressBar
@@ -175,10 +172,9 @@ class StartFragment : Fragment(), OnPacketListener {
                     vmStart.tick()
             }
         } else {
-//            vmStart.tick()
             countDownTimer?.cancel()
             countDownTimer = null
-            onFinish?.invoke()
+            thumbFinishListener?.onStartFragmentFinished()
         }
     }
 
