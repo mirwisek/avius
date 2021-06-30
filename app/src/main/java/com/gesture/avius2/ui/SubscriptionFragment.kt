@@ -2,15 +2,27 @@ package com.gesture.avius2.ui
 
 import android.animation.Animator
 import android.content.Context
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.airbnb.lottie.Lottie
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
+import com.airbnb.lottie.value.LottieFrameInfo
+import com.airbnb.lottie.value.LottieValueCallback
 import com.gesture.avius2.App
 import com.gesture.avius2.R
 import com.gesture.avius2.network.ApiHelper
@@ -22,10 +34,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SubscriptionFragment: Fragment() {
+class SubscriptionFragment : Fragment() {
 
     private val themeColor: Int? by lazy { arguments?.getInt(KEY_THEME_COLOR) }
     private var countDownCompleteListener: OnCountDownCompleteListener? = null
+    private lateinit var animation: LottieAnimationView
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,6 +69,27 @@ class SubscriptionFragment: Fragment() {
             themeColor?.let { setTextColor(it) }
         }
 
+        animation = v.findViewById(R.id.animation)
+
+        // Change color of animated vectors, doesn't affect font
+        animation.addValueCallback(
+            KeyPath("**"),
+            LottieProperty.COLOR_FILTER,
+            object : LottieValueCallback<ColorFilter>() {
+                override fun getValue(frameInfo: LottieFrameInfo<ColorFilter>?): ColorFilter {
+                    return PorterDuffColorFilter(themeColor!!, PorterDuff.Mode.SRC_ATOP)
+                }
+            }
+        )
+
+        // Change font Color
+        animation.addValueCallback(KeyPath("**"), LottieProperty.COLOR,
+            object : LottieValueCallback<Int>() {
+                override fun getValue(frameInfo: LottieFrameInfo<Int>?): Int {
+                    return themeColor!!
+                }
+            })
+
         return v
     }
 
@@ -63,11 +97,11 @@ class SubscriptionFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val repo = (requireActivity().application as App).repository
-        repo.answers.forEach {
-            log("${it.index}) Q: ${it.question.english} -- A: ${it.answer}")
-        }
+//        repo.answers.forEach {
+//            log("${it.index}) Q: ${it.question.english} -- A: ${it.answer}")
+//        }
 
-        ApiHelper.submitAnswer(repo.answers, object: Callback<AnswerResponse> {
+        ApiHelper.submitAnswer(repo.answers, object : Callback<AnswerResponse> {
 
             override fun onResponse(
                 call: Call<AnswerResponse>,
@@ -75,11 +109,11 @@ class SubscriptionFragment: Fragment() {
             ) {
                 var isSuccess = false
                 response.body()?.let {
-                    if(it.status.contentEquals("success")) {
+                    if (it.status.contentEquals("success")) {
                         isSuccess = true
                     }
                 }
-                if(isSuccess)
+                if (isSuccess)
                     log("Answers submitted successfully")
                 else
                     log("Answers couldn't be submitted ${response.code()}")
@@ -91,9 +125,9 @@ class SubscriptionFragment: Fragment() {
 
         })
 
-        val animation =  view.findViewById<LottieAnimationView>(R.id.animation)
 
-        animation.addAnimatorListener(object: Animator.AnimatorListener {
+
+        animation.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
 
             }

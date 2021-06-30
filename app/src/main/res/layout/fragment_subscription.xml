@@ -51,6 +51,24 @@
                 android:textSize="20sp"
                 android:text="Thanks for subscribing!"/>
 
+            <TextView
+                android:id="@+id/textRestart"
+                style="@style/RestartTitle"
+                android:text="Survey will restart in"/>
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animation"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_margin="20dp"
+                app:lottie_autoPlay="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:scaleType="fitCenter"
+                app:lottie_rawRes="@raw/countdown"/>
+
         </LinearLayout>
     </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
