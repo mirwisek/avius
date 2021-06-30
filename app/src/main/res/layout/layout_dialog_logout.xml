@@ -28,6 +28,7 @@
         android:layout_marginTop="30dp"
         android:text="Are you sure you want to log out?"
         android:textColor="@color/teal_light"
+        android:gravity="center_horizontal"
         android:textSize="@dimen/dialog_msg_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,6 +59,5 @@
         app:layout_constraintEnd_toEndOf="@id/msg"
         app:layout_constraintTop_toBottomOf="@id/msg"
         app:strokeColor="@color/black" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

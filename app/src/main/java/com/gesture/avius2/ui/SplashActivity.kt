@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.airbnb.lottie.LottieAnimationView
 import com.gesture.avius2.App
+import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.viewmodels.AppViewModel
 
@@ -26,8 +27,10 @@ class SplashActivity : AppCompatActivity() {
         vmApp.getDbQuestions().observe(this) { questions ->
             questions?.apply {
                 if(isNotEmpty()) {
-                    // TODO: Change to MainActivity
-                    intent = Intent(this@SplashActivity, TestActivity::class.java)
+                    intent = if(BuildConfig.DEBUG_MODE)
+                        Intent(this@SplashActivity, TestActivity::class.java)
+                    else
+                        Intent(this@SplashActivity, MainActivity::class.java)
                     (application as App).repository.questions = this
                 }
             }

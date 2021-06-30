@@ -38,7 +38,7 @@ class SubscriptionFragment : Fragment() {
 
     private val themeColor: Int? by lazy { arguments?.getInt(KEY_THEME_COLOR) }
     private var countDownCompleteListener: OnCountDownCompleteListener? = null
-    private lateinit var animation: LottieAnimationView
+    private var animation: LottieAnimationView? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -72,7 +72,7 @@ class SubscriptionFragment : Fragment() {
         animation = v.findViewById(R.id.animation)
 
         // Change color of animated vectors, doesn't affect font
-        animation.addValueCallback(
+        animation!!.addValueCallback(
             KeyPath("**"),
             LottieProperty.COLOR_FILTER,
             object : LottieValueCallback<ColorFilter>() {
@@ -83,7 +83,7 @@ class SubscriptionFragment : Fragment() {
         )
 
         // Change font Color
-        animation.addValueCallback(KeyPath("**"), LottieProperty.COLOR,
+        animation!!.addValueCallback(KeyPath("**"), LottieProperty.COLOR,
             object : LottieValueCallback<Int>() {
                 override fun getValue(frameInfo: LottieFrameInfo<Int>?): Int {
                     return themeColor!!
@@ -127,7 +127,7 @@ class SubscriptionFragment : Fragment() {
 
 
 
-        animation.addAnimatorListener(object : Animator.AnimatorListener {
+        animation!!.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
 
             }
@@ -143,6 +143,18 @@ class SubscriptionFragment : Fragment() {
             }
 
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        animation?.apply {
+            if(progress > 0) resumeAnimation()
+        }
+    }
+
+    override fun onPause() {
+        animation?.pauseAnimation()
+        super.onPause()
     }
 
     companion object {

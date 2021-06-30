@@ -78,7 +78,7 @@
         app:layout_constraintTop_toTopOf="@id/fabQuestion"
         app:layout_constraintStart_toEndOf="@id/fabQuestion"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical" />
+        android:orientation="horizontal" />
 
     <com.gesture.avius2.customui.GestureButton
         android:id="@+id/btnThumbsUp"

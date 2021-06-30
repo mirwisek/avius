@@ -34,9 +34,9 @@
 
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
                 android:src="@drawable/logo"
                 android:maxHeight="100dp"
                 android:maxWidth="100dp"
@@ -95,7 +95,7 @@
                 android:id="@+id/btnSubmit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/min_height_btn"
+                android:minHeight="40dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

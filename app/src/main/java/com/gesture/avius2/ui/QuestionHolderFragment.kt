@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.gesture.avius2.R
 import com.gesture.avius2.model.QuestionMultiLang
+import com.gesture.avius2.utils.log
 
 class QuestionHolderFragment: Fragment() {
 

@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.15"/>
+        app:layout_constraintGuide_percent="0.3"/>
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.85"/>
+        app:layout_constraintGuide_percent="0.7"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gTop"
@@ -49,12 +49,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7"/>
+        app:layout_constraintGuide_percent="1.0"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
+        android:textSize="22sp"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:id="@+id/title"
@@ -69,9 +69,12 @@
         android:layout_height="0dp"
         android:id="@+id/gestureButton"
         app:thumbDrawable="@drawable/ic_thumb_up"
-        app:layoutPadding="10dp"
-        app:marginCircle="6dp"
+        app:layoutPadding="2dp"
+        app:marginCircle="10dp"
+        app:shadowRadius="50dp"
         app:thumbPadding="@dimen/p_thumb_up_btn"
+        app:progressThicknessRatio="40"
+        app:progressInnerRadiusRatio="4.7"
         app:layout_constraintStart_toStartOf="@id/gStart"
         app:layout_constraintEnd_toEndOf="@id/gEnd"
         app:layout_constraintTop_toTopOf="@id/gTop"

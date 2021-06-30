@@ -19,6 +19,7 @@ import com.gesture.avius2.App
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
+import com.gesture.avius2.utils.log
 import com.gesture.avius2.viewmodels.QuestionViewModel
 import com.google.mediapipe.formats.proto.LandmarkProto
 
