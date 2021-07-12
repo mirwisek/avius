@@ -223,6 +223,10 @@ class MainActivity : AppCompatActivity(),
         setUpSubscriptionFragment(themeColor)
     }
 
+    override fun onTimeout() {
+        setUpStartFragment()
+    }
+
     // On count down finish, restart with the StartFragment again
     override fun onCountDownCompleted() {
         setUpStartFragment()

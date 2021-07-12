@@ -16,6 +16,9 @@ class QuestionViewModel(val app: Application) : AndroidViewModel(app) {
     private val repoQuestions = MutableLiveData(repository.questions)
     val themeColor = repository.settings?.themeColor ?: ""
 
+    val progressTimeout = MutableLiveData(0)
+    val qStartTime = MutableLiveData<Long>()
+
     val questions = Transformations.map(repoQuestions) { ques ->
         val list = arrayListOf<Question>()
         ques?.forEach {

@@ -2,8 +2,10 @@ package com.gesture.avius2.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -11,6 +13,14 @@ import com.gesture.avius2.R
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
 import java.math.RoundingMode
+
+fun ProgressBar.updateAutoAnimate(value: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        setProgress(value, true)
+    } else {
+        progress = value
+    }
+}
 
 val Context.sharedPrefs: SharedPreferences
     get() {

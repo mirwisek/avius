@@ -20,6 +20,7 @@ import com.gesture.avius2.R
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.QuestionsPagerAdapter
 import com.gesture.avius2.utils.log
+import com.gesture.avius2.utils.updateAutoAnimate
 import com.gesture.avius2.viewmodels.QuestionViewModel
 import com.google.mediapipe.formats.proto.LandmarkProto
 
@@ -31,14 +32,20 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var quesProgressBar: ProgressBar
+    private lateinit var progressTimeout: ProgressBar
     private lateinit var tvThumbUp: TextView
     private lateinit var tvThumbDown: TextView
 
     private lateinit var vmQuestions: QuestionViewModel
     private var countDownTimer: CountDownTimer? = null
     private lateinit var handler: Handler
+    private lateinit var handlerTimeout: Handler
     private val resetRunnable = {
         resetCounter()
+    }
+
+    private val timeoutRunnable = {
+        updateTimeoutProgress()
     }
 
     private var shouldTakeInput = false
@@ -50,8 +57,27 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         const val TIMER_COUNT = 3000L
         const val TICK = 100L
         const val NEXT_QUESTION_DELAY = 3000L
+        const val INACTIVITY_TIMEOUT = 30_000L
         // Value after which the thumb status is taken as selected
         const val PROGRESS_APPROVAL_THRESHOLD = 28  // Max Progressbar value is 30
+    }
+
+    override fun onResume() {
+        val qStartedAt = vmQuestions.qStartTime.value
+        val now = System.currentTimeMillis()
+
+        when {
+            //
+            qStartedAt == null -> {
+                vmQuestions.qStartTime.postValue(now)
+            }
+            // If 40 seconds past and no response from user, RESET survey
+            (now - qStartedAt) > INACTIVITY_TIMEOUT -> {
+                surveyCompleteListener?.onTimeout()
+                return
+            }
+        }
+        super.onResume()
     }
 
     override fun onAttach(context: Context) {
@@ -71,6 +97,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
+        handlerTimeout.removeCallbacksAndMessages(null)
         // Safely Remove callbacks
         mainActivity?.removePacketListener(TAG)
         super.onDestroy()
@@ -84,6 +111,10 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_question, container, false)
         vmQuestions = ViewModelProvider(this).get(QuestionViewModel::class.java)
+
+        progressTimeout = v.findViewById<ProgressBar>(R.id.progressTimeout).apply {
+            max = INACTIVITY_TIMEOUT.toInt()
+        }
 
         themeColor = (requireActivity().application as App).themeColor
 
@@ -150,6 +181,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         super.onViewCreated(view, savedInstanceState)
 
         handler = Handler(Looper.getMainLooper())
+        handlerTimeout = Handler(Looper.getMainLooper())
 
         requireActivity().apply {
             if(this is MainActivity) {
@@ -160,9 +192,19 @@ class QuestionsFragment : Fragment() , OnPacketListener {
                 activityDebug = this
         }
 
+        vmQuestions.progressTimeout.observe(viewLifecycleOwner) {
+            if(it < 3000L) {
+                // Reset
+                surveyCompleteListener?.onTimeout()
+            }
+            progressTimeout.progress = it
+        }
+
         // Enable input after delay, give user a chance to read the question
         handler.postDelayed({
             shouldTakeInput = true
+            // Now since input is enable start the progressbar
+            timeoutRunnable()
         }, NEXT_QUESTION_DELAY)
 
         /**
@@ -194,12 +236,19 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         }
     }
 
-    private fun updateQuestionProgress(value: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            quesProgressBar.setProgress(value, true)
-        } else {
-            quesProgressBar.progress = value
+    private fun updateTimeoutProgress() {
+        vmQuestions.qStartTime.value?.let {  old ->
+            val now = System.currentTimeMillis()
+            val diff = now - old
+            val progress = INACTIVITY_TIMEOUT - diff
+            vmQuestions.progressTimeout.postValue(progress.toInt())
+            // Reschedule
+            handlerTimeout.postDelayed(timeoutRunnable, 100L)
         }
+    }
+
+    private fun updateQuestionProgress(value: Int) {
+        quesProgressBar.updateAutoAnimate(value)
     }
 
     private fun getCountDownTimer(): CountDownTimer {
@@ -258,6 +307,10 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         shouldTakeInput = false
         val next = viewPager.currentItem + 1
         if(next < adapter.itemCount) {
+            // Reset timeout progress
+            vmQuestions.qStartTime.postValue(System.currentTimeMillis())
+            vmQuestions.progressTimeout.postValue(INACTIVITY_TIMEOUT.toInt())
+
             vmQuestions.nextQuestion()
             viewPager.setCurrentItem(next, true)
             handler.postDelayed({
@@ -302,5 +355,6 @@ class QuestionsFragment : Fragment() , OnPacketListener {
 
     interface OnSurveyCompleteListener {
         fun onSurveyCompleted(themeColor: Int)
+        fun onTimeout()
     }
 }

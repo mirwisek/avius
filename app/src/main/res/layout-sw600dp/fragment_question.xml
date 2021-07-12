@@ -6,6 +6,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ProgressBar
+        android:id="@+id/progressTimeout"
+        android:layout_width="match_parent"
+        android:indeterminate="false"
+        tools:progress="80"
+        android:scaleY="1.3"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_height="5dp" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gStart"
         android:layout_width="wrap_content"

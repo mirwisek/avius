@@ -82,4 +82,8 @@ class TestActivity : AppCompatActivity(),
         setUpStartFragment()
     }
 
+    override fun onTimeout() {
+        setUpStartFragment()
+    }
+
 }
