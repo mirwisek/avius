@@ -8,6 +8,16 @@ import com.google.mediapipe.formats.proto.LandmarkProto
 
 object LandmarkProcessor {
 
+    fun isThumbTipUp(
+        nList: List<LandmarkProto.NormalizedLandmark>,
+        callback: ((direction: Int) -> Unit)? = null
+    ) {
+        val thumbLine = nList.getPoints(GestureCompareUtils.THUMB_LINE)
+        TODO("Incomplete implementation")
+    }
+
+
+    // Works well to detect close hand but biased with thumb up
     fun process2(
         nList: List<LandmarkProto.NormalizedLandmark>,
         callback: ((direction: Int) -> Unit)? = null
@@ -46,6 +56,7 @@ object LandmarkProcessor {
         return result
     }
 
+    @Deprecated("Doesn't work well with thumb down")
     fun process(
         nList: List<LandmarkProto.NormalizedLandmark>,
         packetListeners: HashMap<String, OnPacketListener>
