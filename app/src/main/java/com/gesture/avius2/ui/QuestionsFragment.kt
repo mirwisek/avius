@@ -119,6 +119,8 @@ class QuestionsFragment : Fragment() , OnPacketListener {
         themeColor = (requireActivity().application as App).themeColor
 
         viewPager = v.findViewById(R.id.vpQuestion)
+        viewPager.isUserInputEnabled = false
+
         quesProgressBar = v.findViewById(R.id.progress)
         tvThumbUp = v.findViewById<TextView>(R.id.thumbUpLabel).apply {
             setTextColor(themeColor)

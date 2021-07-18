@@ -15,8 +15,10 @@ object GestureCompareUtils {
     fun getVerticalDirection(nList: List<LandmarkProto.NormalizedLandmark>): Int {
         return if(nList[4].y < nList[0].y) {
             1 // "UP"
-        } else {
+        } else if(nList[4].y > nList[0].y) {
             -1 // "DN"
+        } else {
+            0
         }
     }
 
@@ -42,7 +44,7 @@ fun List<LandmarkProto.NormalizedLandmark>.getPoints(which: Int, decimalPlace:In
         )
         // 4,3,2
         GestureCompareUtils.THUMB_LINE -> listOf(
-            get(4), get(3), get(2)
+            get(4), get(3), get(2), get(1)
         )
         // 0
         else -> listOf(get(0))

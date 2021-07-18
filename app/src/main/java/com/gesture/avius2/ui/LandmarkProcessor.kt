@@ -1,9 +1,6 @@
 package com.gesture.avius2.ui
 
-import com.gesture.avius2.utils.GestureCompareUtils
-import com.gesture.avius2.utils.areAdjacentParallelX
-import com.gesture.avius2.utils.areParallel
-import com.gesture.avius2.utils.getPoints
+import com.gesture.avius2.utils.*
 import com.google.mediapipe.formats.proto.LandmarkProto
 
 object LandmarkProcessor {
@@ -12,8 +9,30 @@ object LandmarkProcessor {
         nList: List<LandmarkProto.NormalizedLandmark>,
         callback: ((direction: Int) -> Unit)? = null
     ) {
-        val thumbLine = nList.getPoints(GestureCompareUtils.THUMB_LINE)
-        TODO("Incomplete implementation")
+        // 0=TIP, 1=DIP, 2=PIP, 3=MCP (TOP to Bottom -> 0-3)
+        /**
+         * The main logic is, the top of stack must be minimum
+         */
+        val tl = nList.getPoints(GestureCompareUtils.THUMB_LINE).toMutableList()
+        var minChecks = 0
+        var maxChecks = 0
+        for(i in 0..3) {
+            val isTopMin = tl.minOf { it.y } == tl[0].y
+            val isTopMax = tl.maxOf { it.y } == tl[0].y
+            if(isTopMin)
+                minChecks++
+            else if(isTopMax)
+                maxChecks++
+            tl.removeAt(0)  // Remove first element
+        }
+        val res = when {
+            minChecks >= 3 -> 1     // When all are minimum (ThumbsUp)
+            maxChecks >= 3 -> -1    // When all are maximum (ThumbsDown)
+            else -> 0               // Some other gesture
+        }
+        callback?.invoke(res)
+        // Just for debug
+//        return "minChecks = $minChecks and maxChecks = $maxChecks"
     }
 
 
@@ -36,21 +55,22 @@ object LandmarkProcessor {
         val zipTip = tip.zip(pip)
         val areZipTip = zipTip.areAdjacentParallelX(2.5F..20F)
 
-        val dir = GestureCompareUtils.getVerticalDirection(nList)
+//        val dir = GestureCompareUtils.getVerticalDirection(nList)
 
         if(areParallel || areZipTip) {
-            callback?.invoke(dir)
+//            callback?.invoke(dir)
+            result += isThumbTipUp(nList, callback)
         }
 
-        result += "pipDip = $areParallel and $dir\n\n"
-        zipped.forEach {
-            result += "P: ${it.first.x},  D: ${it.second.x}\n"
-        }
-
-        result += "\npipTip = $areZipTip and $dir\n\n"
-        zipped.forEach {
-            result += "P: ${it.second.x},  T: ${it.first.x}\n"
-        }
+//        result += "pipDip = $areParallel and $dir\n\n"
+//        zipped.forEach {
+//            result += "P: ${it.first.x},  D: ${it.second.x}\n"
+//        }
+//
+//        result += "\npipTip = $areZipTip and $dir\n\n"
+//        zipped.forEach {
+//            result += "P: ${it.second.x},  T: ${it.first.x}\n"
+//        }
 
 
         return result
