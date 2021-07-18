@@ -39,8 +39,8 @@ class StartActivity : AppCompatActivity() {
         val btnSubmit = findViewById<MaterialButton>(R.id.btnSubmit)
 
         // DEBUG ONLY
-        etPointID.setText("11")
-        etCompanyID.setText("IMH0010")
+//        etPointID.setText("11")
+//        etCompanyID.setText("IMH0010")
 
         val errorView = findViewById<ConstraintLayout>(R.id.errorLayout)
         errorView.setOnClickListener {
