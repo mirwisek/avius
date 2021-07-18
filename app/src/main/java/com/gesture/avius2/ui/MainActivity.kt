@@ -224,7 +224,16 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onTimeout() {
-        setUpStartFragment()
+        /**
+         * -- Make sure timeout doesn't override subscription fragment while it is visible
+         *
+         * Happens while user is in last question, and he responds at the last seconds
+         * Timeout logic tries to restart but the input is considered also that switches to subscript fragment
+         * in this case we don't want timeout to interrupt and let Subscription take lead
+         */
+        val frag = supportFragmentManager.findFragmentByTag(SubscriptionFragment.TAG)
+        if(frag?.isVisible == false)
+            setUpStartFragment()
     }
 
     // On count down finish, restart with the StartFragment again
