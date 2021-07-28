@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -92,8 +94,9 @@ dependencies {
     // Network
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
-    implementation "com.squareup.okhttp3:okhttp:4.9.0"
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.4.0'
+    // Not using in release version, to reduce app size
+//    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+//    implementation 'com.squareup.okhttp3:logging-interceptor:4.4.0'
 
     // Lottie
     implementation 'com.airbnb.android:lottie:3.7.0'
@@ -101,5 +104,8 @@ dependencies {
     def room_version = "2.3.0"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+
+    implementation platform('com.google.firebase:firebase-bom:27.1.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
 
 }

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "452875304750",
+    "project_id": "avius-touchless",
+    "storage_bucket": "avius-touchless.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452875304750:android:30c4d91b2342bfb59e84bf",
+        "android_client_info": {
+          "package_name": "com.gesture.avius2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "452875304750-eirck69mbau8vc3v8qtlds4st7ft712r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gesture.avius2",
+            "certificate_hash": "addd0e9631567cae6296db933308ad3d5f64e276"
+          }
+        },
+        {
+          "client_id": "452875304750-fdj5085k4b3jj0r3vbnoagt07k8vt2nq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFgTmUCVJFObv5kogzLcVEzt54d0XRwxw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "452875304750-fdj5085k4b3jj0r3vbnoagt07k8vt2nq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
