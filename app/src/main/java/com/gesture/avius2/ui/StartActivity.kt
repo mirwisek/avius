@@ -1,5 +1,6 @@
 package com.gesture.avius2.ui
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -7,7 +8,10 @@ import android.text.Editable
 import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.UnderlineSpan
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -17,6 +21,7 @@ import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.network.ApiHelper
+import com.gesture.avius2.utils.hideKeyboard
 import com.gesture.avius2.utils.invisible
 import com.gesture.avius2.utils.visible
 import com.gesture.avius2.viewmodels.AppViewModel
@@ -27,22 +32,30 @@ import com.google.android.material.textfield.TextInputEditText
 
 class StartActivity : AppCompatActivity() {
 
+    private lateinit var etCompanyID: TextInputEditText
+    private lateinit var etPointID: TextInputEditText
+    private lateinit var btnSubmit: MaterialButton
+    private lateinit var errorView: ConstraintLayout
+    private lateinit var dialogLoading: CustomDialog
+
+    private lateinit var vmApp: AppViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
-        val vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
+        vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
         window.statusBarColor = (application as App).themeColor
 
-        val etCompanyID = findViewById<TextInputEditText>(R.id.etCompanyID)
-        val etPointID = findViewById<TextInputEditText>(R.id.etPointID)
-        val btnSubmit = findViewById<MaterialButton>(R.id.btnSubmit)
+        etCompanyID = findViewById<TextInputEditText>(R.id.etCompanyID)
+        etPointID = findViewById<TextInputEditText>(R.id.etPointID)
+        btnSubmit = findViewById<MaterialButton>(R.id.btnSubmit)
 
         // DEBUG ONLY
 //        etPointID.setText("11")
 //        etCompanyID.setText("IMH0010")
 
-        val errorView = findViewById<ConstraintLayout>(R.id.errorLayout)
+        errorView = findViewById<ConstraintLayout>(R.id.errorLayout)
         errorView.setOnClickListener {
             errorView.invisible()
         }
@@ -53,7 +66,7 @@ class StartActivity : AppCompatActivity() {
             setSpan(UnderlineSpan(), 0, length, 0)
         }
 
-        val dialogLoading = CustomDialog(this) { parent, dialog ->
+        dialogLoading = CustomDialog(this) { parent, dialog ->
             val v = layoutInflater.inflate(R.layout.layout_dialog_loading, parent)
         }
 
@@ -70,37 +83,57 @@ class StartActivity : AppCompatActivity() {
             }
         })
 
-
-        btnSubmit.setOnClickListener {
-
-            if(etCompanyID.text.isNullOrEmpty() || etPointID.text.isNullOrEmpty()) {
-                showError(errorView, "Text fields can't be empty")
-            } else if(etCompanyID.error == null && etPointID.error == null) {
-                val company = etCompanyID.text.toString()
-                val pointId = etPointID.text.toString()
-
-                dialogLoading.show()
-
-                ApiHelper.getQuestions(company, pointId) { result ->
-                    result.fold(
-                        onSuccess = {
-                            vmApp.saveQuestions(it)
-                            vmApp.saveSettings(it)
-                            dialogLoading.dismiss()
-                            start()
-                        },
-                        onFailure = {
-                            errorView.visible()
-                            it.printStackTrace()
-                            dialogLoading.dismiss()
-                        }
-                    )
-                }
-            } else {
-                showError(errorView, "Please fix all errors first")
+        etPointID.setOnEditorActionListener { v, actionId, event ->
+            if(actionId == EditorInfo.IME_ACTION_DONE) {
+                // Dismiss keyboard before submitting to show the error if any
+                hideKeyboard(currentFocus!!.windowToken)
+                submitForm()
+                return@setOnEditorActionListener true
             }
+            false
         }
 
+        btnSubmit.setOnClickListener {
+            submitForm()
+        }
+
+    }
+
+    private fun submitForm() {
+        if(etCompanyID.text.isNullOrEmpty() || etPointID.text.isNullOrEmpty()) {
+            showError(errorView, "Text fields can't be empty")
+        } else if(etCompanyID.error == null && etPointID.error == null) {
+            val company = etCompanyID.text.toString()
+            val pointId = etPointID.text.toString()
+
+            dialogLoading.show()
+
+            ApiHelper.getQuestions(company, pointId) { result ->
+                result.fold(
+                    onSuccess = {
+                        vmApp.saveQuestions(it)
+                        vmApp.saveSettings(it)
+                        dialogLoading.dismiss()
+                        start()
+                    },
+                    onFailure = {
+                        errorView.visible()
+                        it.printStackTrace()
+                        dialogLoading.dismiss()
+                    }
+                )
+            }
+        } else {
+            showError(errorView, "Please fix all errors first")
+        }
+    }
+
+    // Hide Keyboard when clicked outside the focus area
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (currentFocus != null) {
+            hideKeyboard(currentFocus!!.windowToken)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun showError(parent: View, msg: String) {

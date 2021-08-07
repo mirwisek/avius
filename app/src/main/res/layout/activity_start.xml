@@ -65,6 +65,9 @@
                     android:layout_height="match_parent"
                     android:backgroundTint="@color/bg"
                     android:inputType="textCapCharacters"
+                    android:imeOptions="actionNext"
+                    android:maxLines="1"
+                    android:nextFocusForward="@id/textLayoutPointID"
                     android:hint="Company's ID"/>
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -84,8 +87,11 @@
                     android:id="@+id/etPointID"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@color/bg"
+                    android:imeOptions="actionDone"
                     android:inputType="number"
+                    android:maxLines="1"
+                    android:nextFocusForward="@id/btnSubmit"
+                    android:backgroundTint="@color/bg"
                     android:hint="Point's ID"/>
 
             </com.google.android.material.textfield.TextInputLayout>

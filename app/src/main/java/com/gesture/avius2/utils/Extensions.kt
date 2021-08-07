@@ -3,8 +3,10 @@ package com.gesture.avius2.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import android.os.IBinder
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -13,6 +15,11 @@ import com.gesture.avius2.R
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
 import java.math.RoundingMode
+
+fun Context.hideKeyboard(windowToken: IBinder) {
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(windowToken, 0)
+}
 
 fun ProgressBar.updateAutoAnimate(value: Int) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

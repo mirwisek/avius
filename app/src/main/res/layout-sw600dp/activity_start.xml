@@ -61,6 +61,9 @@
                     android:id="@+id/etCompanyID"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
                     android:backgroundTint="@color/bg"
                     android:hint="Company's ID"/>
 
@@ -79,6 +82,9 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPointID"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:maxLines="1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:backgroundTint="@color/bg"

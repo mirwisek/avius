@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         if (wasAbleToLoadLibrary) {
             setContentView(R.layout.activity_main)
             vmApp = ViewModelProvider(this).get(AppViewModel::class.java)

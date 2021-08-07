@@ -18,7 +18,11 @@ class App: Application() {
 
 
         sharedPrefs.getString(KEY_THEME, null)?.let {
-            themeColor = Color.parseColor(it)
+            try {
+                themeColor = Color.parseColor(it)
+            } catch(e: IndexOutOfBoundsException) {
+                // Do nothing
+            }
         }
 
         if(themeColor == -1)
