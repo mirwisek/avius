@@ -26,13 +26,13 @@
             android:layout_marginStart="@dimen/ml_login_card_internal"
             android:layout_marginEnd="@dimen/ml_login_card_internal"
             android:layout_marginTop="@dimen/mt_login_card_internal"
-            android:layout_marginBottom="@dimen/mb_login_card_internal"
+            android:layout_marginBottom="40dp"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imageDone"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="30dp"
                 android:src="@drawable/ic_done"
                 android:maxHeight="200dp"
@@ -57,8 +57,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animation"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_margin="20dp"
                 app:lottie_autoPlay="true"
                 app:layout_constraintStart_toStartOf="parent"

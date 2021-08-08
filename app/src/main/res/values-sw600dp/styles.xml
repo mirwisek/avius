@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="FragmentQuestionGestureButton">
-        <item name="android:layout_width">340dp</item>
-        <item name="android:layout_height">340dp</item>
-        <item name="layoutPadding">25dp</item>
-        <item name="shadowRadius">140dp</item>
+        <item name="layout_constraintVertical_bias">0.36</item>
+        <item name="android:layout_width">260dp</item>
+        <item name="android:layout_height">260dp</item>
+        <item name="layoutPadding">10dp</item>
+        <item name="shadowRadius">104dp</item>
         <item name="progressThicknessRatio">30</item>
         <item name="progressInnerRadiusRatio">2.5</item>
         <item name="marginCircle">@dimen/margin_circle_f_question</item>
@@ -32,7 +33,7 @@
     <style name="GestureButtonLabel">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/blue_main</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>

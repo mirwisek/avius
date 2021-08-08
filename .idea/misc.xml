@@ -4,9 +4,13 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/activity_start.xml" value="0.3203551912568306" />
-        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/fragment_start.xml" value="0.34289617486338797" />
-        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/layout_login.xml" value="0.536" />
+        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/error_card.xml" value="0.1" />
+        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/fragment_question.xml" value="0.1" />
+        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/fragment_start.xml" value="0.1" />
+        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/fragment_subscription.xml" value="0.1" />
+        <entry key="..\:/Avius/app/src/main/res/layout-sw600dp/layout_login.xml" value="0.1" />
         <entry key="..\:/Avius/app/src/main/res/layout/activity_start.xml" value="0.22897669706180346" />
+        <entry key="..\:/Avius/app/src/main/res/layout/fragment_q_text.xml" value="0.1" />
       </map>
     </option>
   </component>
