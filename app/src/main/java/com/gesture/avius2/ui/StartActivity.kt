@@ -80,8 +80,8 @@ class StartActivity : AppCompatActivity() {
             setSpan(UnderlineSpan(), 0, length, 0)
         }
 
-        dialogLoading = CustomDialog(this) { parent, dialog ->
-            val v = layoutInflater.inflate(R.layout.layout_dialog_loading, parent)
+        dialogLoading = CustomDialog(this) { parentView, dialog ->
+            val v = layoutInflater.inflate(R.layout.layout_dialog_loading, parentView)
         }
 
         etCompanyID.addTextChangedListener(object: TextWatcher {
