@@ -27,7 +27,7 @@ object ApiHelper {
         service.getQuestions(requestBody).enqueue(object: Callback<ResponseData> {
             override fun onResponse(call: Call<ResponseData>, response: Response<ResponseData>) {
                 val body = response.body()
-                if(response.isSuccessful && body != null) {
+                if(response.isSuccessful && body != null && !response.body()!!.status.contains("fail")) {
                     onResult(Result.success(body))
                 } else {
                     onResult(Result.failure(Exception(body?.msg)))
