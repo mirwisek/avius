@@ -4,6 +4,7 @@ import android.app.Application
 import android.graphics.Color
 import androidx.core.content.ContextCompat
 import com.gesture.avius2.network.Repository
+import com.gesture.avius2.utils.log
 import com.gesture.avius2.utils.sharedPrefs
 
 const val KEY_THEME = "theme.color"

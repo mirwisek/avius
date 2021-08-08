@@ -8,6 +8,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ import com.gesture.avius2.R
 import com.gesture.avius2.network.ApiHelper
 import com.gesture.avius2.network.models.AnswerResponse
 import com.gesture.avius2.utils.log
+import com.gesture.avius2.utils.sharedPrefs
 import com.gesture.avius2.utils.visible
 import com.gesture.avius2.viewmodels.QuestionViewModel
 import retrofit2.Call
@@ -101,31 +103,35 @@ class SubscriptionFragment : Fragment() {
 //            log("${it.index}) Q: ${it.question.english} -- A: ${it.answer}")
 //        }
 
-        ApiHelper.submitAnswer(repo.answers, object : Callback<AnswerResponse> {
+        val pointId = requireContext().sharedPrefs.getString(StartActivity.KEY_POINT_ID, null)
 
-            override fun onResponse(
-                call: Call<AnswerResponse>,
-                response: Response<AnswerResponse>
-            ) {
-                var isSuccess = false
-                response.body()?.let {
-                    if (it.status.contentEquals("success")) {
-                        isSuccess = true
+        if(pointId != null) {
+            ApiHelper.submitAnswer(repo.answers, pointId, object : Callback<AnswerResponse> {
+
+                override fun onResponse(
+                    call: Call<AnswerResponse>,
+                    response: Response<AnswerResponse>
+                ) {
+                    var isSuccess = false
+                    response.body()?.let {
+                        if (it.status.contentEquals("success")) {
+                            isSuccess = true
+                        }
                     }
+                    if (isSuccess)
+                        log("Answers submitted successfully")
+                    else
+                        log("Answers couldn't be submitted ${response.code()}")
                 }
-                if (isSuccess)
-                    log("Answers submitted successfully")
-                else
-                    log("Answers couldn't be submitted ${response.code()}")
-            }
 
-            override fun onFailure(call: Call<AnswerResponse>, t: Throwable) {
-                t.printStackTrace()
-            }
+                override fun onFailure(call: Call<AnswerResponse>, t: Throwable) {
+                    t.printStackTrace()
+                }
 
-        })
-
-
+            })
+        } else {
+            Log.d("ffnet", "Answer submission failed, pointId was null")
+        }
 
         animation!!.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {

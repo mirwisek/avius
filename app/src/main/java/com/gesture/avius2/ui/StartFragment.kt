@@ -89,7 +89,7 @@ class StartFragment : Fragment(), OnPacketListener {
         handler = Handler(Looper.getMainLooper())
         vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
         themeColor = app.themeColor
-
+        log("THEME FR COLOR $themeColor")
         vmApp = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
 
         vmApp.isOnline.observe(viewLifecycleOwner) { isOnline ->

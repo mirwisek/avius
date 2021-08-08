@@ -1,6 +1,8 @@
 package com.gesture.avius2.viewmodels
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.graphics.Color
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -41,6 +43,7 @@ class AppViewModel(val app: Application): AndroidViewModel(app) {
         }
     }
 
+    @SuppressLint("Range")
     fun saveSettings(data: ResponseData) {
         viewModelScope.launch {
             val theme = data.point.form.theme_color
@@ -49,7 +52,10 @@ class AppViewModel(val app: Application): AndroidViewModel(app) {
                 putString(KEY_THEME, theme)
             }
             val entity = SettingsEntity(theme, data.logo)
-            (app as App).repository.settings = entity
+            (app as App).apply {
+                repository.settings = entity
+                themeColor = Color.parseColor(theme)
+            }
             db.settingsDao().insert(entity)
         }
     }

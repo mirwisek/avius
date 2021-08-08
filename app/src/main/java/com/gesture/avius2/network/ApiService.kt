@@ -13,8 +13,8 @@ interface ApiService {
     @POST("/api/questions/{point_id}")
     fun getQuestions(@Path("point_id") pointId: String, @Body body: RequestBody): Call<ResponseData>
 
-    @POST("/api/answers/7")
-    fun submitAnswer(@Body body: RequestBody): Call<AnswerResponse>
+    @POST("/api/answers/{point_id}")
+    fun submitAnswer(@Path("point_id") pointId: String, @Body body: RequestBody): Call<AnswerResponse>
 
     // Ignore the rest of the Json parameters, that is why not creating a separate data class
     @POST("/api/user/logout")

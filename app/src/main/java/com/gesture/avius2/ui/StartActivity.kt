@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.App
 import com.gesture.avius2.BuildConfig
@@ -40,6 +41,10 @@ class StartActivity : AppCompatActivity() {
     private lateinit var dialogLoading: CustomDialog
 
     private lateinit var vmApp: AppViewModel
+
+    companion object {
+        const val KEY_POINT_ID = "pointId.key"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,6 +138,9 @@ class StartActivity : AppCompatActivity() {
             ApiHelper.getQuestions(company, pointId) { result ->
                 result.fold(
                     onSuccess = {
+                        sharedPrefs.edit {
+                            putString(KEY_POINT_ID, pointId)
+                        }
                         vmApp.saveQuestions(it)
                         vmApp.saveSettings(it)
                         dialogLoading.dismiss()

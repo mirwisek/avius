@@ -40,7 +40,7 @@ object ApiHelper {
         })
     }
 
-    fun submitAnswer(answers: List<Question>, callback: Callback<AnswerResponse>) {
+    fun submitAnswer(answers: List<Question>, pointId: String, callback: Callback<AnswerResponse>) {
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM).apply {
                 answers.forEach {
@@ -48,7 +48,7 @@ object ApiHelper {
                 }
             }.build()
 
-        service.submitAnswer(requestBody).enqueue(callback)
+        service.submitAnswer(pointId, requestBody).enqueue(callback)
     }
 
     fun logout(email: String, password: String, callback: Callback<AnswerResponse>) {
