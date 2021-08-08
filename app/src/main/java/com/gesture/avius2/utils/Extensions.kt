@@ -2,6 +2,10 @@ package com.gesture.avius2.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -9,12 +13,45 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.gesture.avius2.R
+import com.google.android.material.snackbar.Snackbar
 import com.google.mediapipe.formats.proto.LandmarkProto
 import java.math.BigDecimal
 import java.math.RoundingMode
+
+fun View.makeNetworkSnack(isOnline: Boolean) {
+    context.let { ctx ->
+        val msg = if(isOnline) ctx.getString(R.string.connected) else ctx.getString(R.string.disconnected)
+        val color = if(isOnline) ctx.getColorCompat(R.color.teal_700) else ctx.getColorCompat(R.color.red)
+        Snackbar.make(this, msg, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(color)
+            .show()
+    }
+}
+
+fun Context.getColorCompat(@ColorRes color: Int): Int {
+    return ContextCompat.getColor(this, color)
+}
+
+fun Context.isOnline(): Boolean {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val nw      = connectivityManager.activeNetwork ?: return false
+        val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
+        return when {
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            else -> false
+        }
+    } else {
+        val nwInfo = connectivityManager.activeNetworkInfo ?: return false
+        return nwInfo.isConnected
+    }
+}
 
 fun Context.hideKeyboard(windowToken: IBinder) {
     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

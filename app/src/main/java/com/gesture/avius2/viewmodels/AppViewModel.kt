@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gesture.avius2.App
+import com.gesture.avius2.ConnectionLiveData
 import com.gesture.avius2.KEY_THEME
 import com.gesture.avius2.db.AppDatabase
 import com.gesture.avius2.db.QuestionEntity
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(val app: Application): AndroidViewModel(app) {
 
+    val isOnline = ConnectionLiveData(app.applicationContext)
     private val db = AppDatabase.getInstance(app.applicationContext, viewModelScope)
 
     fun saveQuestions(data: ResponseData) {

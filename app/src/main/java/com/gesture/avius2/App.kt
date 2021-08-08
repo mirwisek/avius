@@ -12,6 +12,8 @@ class App: Application() {
 
     val repository = Repository()
     var themeColor: Int = -1
+    // Store previous internet connectivity status
+    var wasOnline = false
 
     override fun onCreate() {
         super.onCreate()

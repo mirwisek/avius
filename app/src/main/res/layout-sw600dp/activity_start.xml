@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg"
+    android:id="@+id/parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include layout="@layout/error_card"

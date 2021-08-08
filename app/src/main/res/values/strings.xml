@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Avius</string>
+    <string name="connected">Your back online!</string>
+    <string name="disconnected">No active internet!</string>
 </resources>

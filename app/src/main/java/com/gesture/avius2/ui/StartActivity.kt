@@ -2,7 +2,9 @@ package com.gesture.avius2.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -10,6 +12,7 @@ import android.text.TextWatcher
 import android.text.style.UnderlineSpan
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -21,9 +24,7 @@ import com.gesture.avius2.BuildConfig
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.network.ApiHelper
-import com.gesture.avius2.utils.hideKeyboard
-import com.gesture.avius2.utils.invisible
-import com.gesture.avius2.utils.visible
+import com.gesture.avius2.utils.*
 import com.gesture.avius2.viewmodels.AppViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
@@ -44,8 +45,21 @@ class StartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
+        val parent = findViewById<ViewGroup>(R.id.parent)
+        val app = application as App
+
         vmApp = ViewModelProvider(this).get(AppViewModel::class.java)
-        window.statusBarColor = (application as App).themeColor
+        window.statusBarColor = app.themeColor
+
+        vmApp.isOnline.observe(this) { isOnline ->
+            if(!isOnline){  // When offline show snack red
+                parent.makeNetworkSnack(isOnline)
+            } else if(isOnline && !app.wasOnline) {
+                // When offline and switched to back online show green
+                parent.makeNetworkSnack(isOnline)
+            }
+            app.wasOnline = isOnline
+        }
 
         etCompanyID = findViewById<TextInputEditText>(R.id.etCompanyID)
         etPointID = findViewById<TextInputEditText>(R.id.etPointID)
@@ -87,16 +101,24 @@ class StartActivity : AppCompatActivity() {
             if(actionId == EditorInfo.IME_ACTION_DONE) {
                 // Dismiss keyboard before submitting to show the error if any
                 hideKeyboard(currentFocus!!.windowToken)
-                submitForm()
+                checkNetworkAndSubmit(parent)
                 return@setOnEditorActionListener true
             }
             false
         }
 
         btnSubmit.setOnClickListener {
-            submitForm()
+            checkNetworkAndSubmit(parent)
         }
 
+    }
+
+    private fun checkNetworkAndSubmit(parent: View) {
+        if(vmApp.isOnline.value!!) {
+            submitForm()
+        } else {
+            parent.makeNetworkSnack(false)
+        }
     }
 
     private fun submitForm() {
