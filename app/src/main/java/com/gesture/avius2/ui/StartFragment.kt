@@ -14,6 +14,8 @@ import com.gesture.avius2.customui.CustomDialog
 import com.gesture.avius2.customui.GestureButton
 import com.gesture.avius2.customui.LoginDialog
 import com.gesture.avius2.utils.log
+import com.gesture.avius2.utils.makeNetworkSnack
+import com.gesture.avius2.viewmodels.AppViewModel
 import com.gesture.avius2.viewmodels.StartViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -27,6 +29,7 @@ class StartFragment : Fragment(), OnPacketListener {
 
     private var thumbFinishListener: OnThumbDetectionFinishListener? = null
 
+    private lateinit var vmApp: AppViewModel
     private lateinit var vmStart: StartViewModel
     private var countDownTimer: CountDownTimer? = null
     private lateinit var handler: Handler
@@ -81,9 +84,23 @@ class StartFragment : Fragment(), OnPacketListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        val app = requireActivity().application as App
         handler = Handler(Looper.getMainLooper())
         vmStart = ViewModelProvider(this).get(StartViewModel::class.java)
-        themeColor = (requireActivity().application as App).themeColor
+        themeColor = app.themeColor
+
+        vmApp = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
+
+        vmApp.isOnline.observe(viewLifecycleOwner) { isOnline ->
+            if(!isOnline){  // When offline show snack red
+                view.makeNetworkSnack(isOnline)
+            } else if(isOnline && !app.wasOnline) {
+                // When offline and switched to back online show green
+                view.makeNetworkSnack(isOnline)
+            }
+            app.wasOnline = isOnline
+        }
 
         // Don't initialize in tablet testing mode
         requireActivity().apply {
@@ -99,8 +116,15 @@ class StartFragment : Fragment(), OnPacketListener {
             val v = layoutInflater.inflate(R.layout.layout_dialog_logout, parent)
 
             v.findViewById<MaterialButton>(R.id.btn_yes).setOnClickListener {
-                dialog.dismiss()
-                showLogin()
+
+                vmApp.isOnline.value?.let { isOnline ->
+                    if(isOnline) {
+                        dialog.dismiss()
+                        showLogin()
+                    } else {
+                        view.makeNetworkSnack(false)
+                    }
+                }
             }
             v.findViewById<MaterialButton>(R.id.btn_no).setOnClickListener {
                 dialog.dismiss()

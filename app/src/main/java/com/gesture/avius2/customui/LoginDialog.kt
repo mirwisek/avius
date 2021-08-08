@@ -9,11 +9,16 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.network.ApiHelper
 import com.gesture.avius2.network.models.AnswerResponse
+import com.gesture.avius2.utils.hideKeyboard
+import com.gesture.avius2.utils.makeNetworkSnack
+import com.gesture.avius2.viewmodels.AppViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import retrofit2.Call
@@ -27,7 +32,10 @@ class LoginDialog() : DialogFragment() {
     private var dismissListener: ((isScheduledLogout: Boolean) -> Unit)? = null
 
     private var textError: TextView? = null
+    private lateinit var etPassword: TextInputEditText
+    private lateinit var etEmail: TextInputEditText
 
+    private lateinit var vmApp: AppViewModel
     private var isScheduledLogout = false
 
     override fun onCreateView(
@@ -38,12 +46,13 @@ class LoginDialog() : DialogFragment() {
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        vmApp = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         val v = inflater.inflate(R.layout.layout_login, container, false)
 
         textError = v.findViewById<TextView>(R.id.textError)
 
-        val etPassword = v.findViewById<TextInputEditText>(R.id.etPassword)
-        val etEmail = v.findViewById<TextInputEditText>(R.id.etEmail)
+        etPassword = v.findViewById<TextInputEditText>(R.id.etPassword)
+        etEmail = v.findViewById<TextInputEditText>(R.id.etEmail)
         val btnSubmit = v.findViewById<MaterialButton>(R.id.btnSubmit)
 
         etEmail.addTextChangedListener(object: TextWatcher {
@@ -60,21 +69,46 @@ class LoginDialog() : DialogFragment() {
         })
 
         btnSubmit.setOnClickListener {
-            textError!!.text = ""   // Reset error before trying
-            if(etEmail.text.isNullOrEmpty() || etPassword.text.isNullOrEmpty()) {
-                textError!!.text = "Text fields can't be empty"
-            } else if(etEmail.error == null && etPassword.error == null) {
-                val email = etEmail.text.toString()
-                val password = etPassword.text.toString()
-                /**
-                 * IF users dismiss from this moment, parent will know there is possibility of logout
-                 */
-                isScheduledLogout = true
-                authenticate(email, password)
+            checkNetworkAndSubmit(v)
+        }
+
+        val ctx = requireContext()
+        etPassword.setOnEditorActionListener { _, actionId, event ->
+            if(actionId == EditorInfo.IME_ACTION_DONE) {
+                // Dismiss keyboard before submitting to show the error if any
+                dialog?.currentFocus?.windowToken?.let {
+                    ctx.hideKeyboard(it)
+                }
+                checkNetworkAndSubmit(v)
+                return@setOnEditorActionListener true
             }
+            false
         }
 
         return v
+    }
+
+    fun logout() {
+        textError!!.text = ""   // Reset error before trying
+        if(etEmail.text.isNullOrEmpty() || etPassword.text.isNullOrEmpty()) {
+            textError!!.text = "Text fields can't be empty"
+        } else if(etEmail.error == null && etPassword.error == null) {
+            val email = etEmail.text.toString()
+            val password = etPassword.text.toString()
+            /**
+             * IF users dismiss from this moment, parent will know there is possibility of logout
+             */
+            isScheduledLogout = true
+            authenticate(email, password)
+        }
+    }
+
+    private fun checkNetworkAndSubmit(parent: View) {
+        if(vmApp.isOnline.value!!) {
+            logout()
+        } else {
+            parent.makeNetworkSnack(false)
+        }
     }
 
 

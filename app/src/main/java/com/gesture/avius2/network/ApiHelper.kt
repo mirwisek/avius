@@ -21,10 +21,9 @@ object ApiHelper {
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("company_id", companyId)
-            .addFormDataPart("point_id", pointId)
             .build()
 
-        service.getQuestions(requestBody).enqueue(object: Callback<ResponseData> {
+        service.getQuestions(pointId, requestBody).enqueue(object: Callback<ResponseData> {
             override fun onResponse(call: Call<ResponseData>, response: Response<ResponseData>) {
                 val body = response.body()
                 if(response.isSuccessful && body != null && !response.body()!!.status.contains("fail")) {

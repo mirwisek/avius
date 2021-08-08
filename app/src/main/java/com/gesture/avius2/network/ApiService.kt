@@ -6,11 +6,12 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiService {
 
-    @POST("/api/questions/11")
-    fun getQuestions(@Body body: RequestBody): Call<ResponseData>
+    @POST("/api/questions/{point_id}")
+    fun getQuestions(@Path("point_id") pointId: String, @Body body: RequestBody): Call<ResponseData>
 
     @POST("/api/answers/7")
     fun submitAnswer(@Body body: RequestBody): Call<AnswerResponse>
