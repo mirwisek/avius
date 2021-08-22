@@ -10,7 +10,12 @@ object GestureCompareUtils {
     const val DIP = 2
     const val PIP = 3
     const val MCP = 4
-    const val THUMB_LINE = 5
+    const val INDEX = 5
+    const val MIDDLE = 6
+    const val RING = 7
+    const val PINKY = 8
+    const val THUMB_LINE = 9
+    const val PALM = 0
 
     fun getVerticalDirection(nList: List<LandmarkProto.NormalizedLandmark>): Int {
         return if(nList[4].y < nList[0].y) {
@@ -42,9 +47,22 @@ fun List<LandmarkProto.NormalizedLandmark>.getPoints(which: Int, decimalPlace:In
         GestureCompareUtils.MCP -> listOf(
             get(5), get(9), get(13), get(17)
         )
-        // 4,3,2
+        // 4,3,2,1
         GestureCompareUtils.THUMB_LINE -> listOf(
             get(4), get(3), get(2), get(1)
+        )
+        // Following are outside in (8 being the tip and 5 being palm side)
+        GestureCompareUtils.INDEX -> listOf(
+            get(8), get(7), get(6), get(5)
+        )
+        GestureCompareUtils.MIDDLE -> listOf(
+            get(12), get(11), get(10), get(9)
+        )
+        GestureCompareUtils.RING -> listOf(
+            get(16), get(15), get(14), get(13)
+        )
+        GestureCompareUtils.PINKY -> listOf(
+            get(20), get(19), get(18), get(17)
         )
         // 0
         else -> listOf(get(0))

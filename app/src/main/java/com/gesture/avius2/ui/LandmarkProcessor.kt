@@ -1,9 +1,18 @@
 package com.gesture.avius2.ui
 
+import com.gesture.avius2.Point
 import com.gesture.avius2.utils.*
 import com.google.mediapipe.formats.proto.LandmarkProto
 
 object LandmarkProcessor {
+
+//    fun isThumbTipUp(
+//        nList: List<LandmarkProto.NormalizedLandmark>,
+//        callback: ((direction: Int) -> Unit)? = null
+//    ) {
+//        val tl = nList.getPoints(GestureCompareUtils.THUMB_LINE).toMutableList()
+//        return tl[0]
+//    }
 
     fun isThumbTipUp(
         nList: List<LandmarkProto.NormalizedLandmark>,
@@ -35,7 +44,34 @@ object LandmarkProcessor {
 //        return "minChecks = $minChecks and maxChecks = $maxChecks"
     }
 
+    fun processZAxis(
+        nList: List<LandmarkProto.NormalizedLandmark>,
+        callback: ((areFingersCurled: Boolean) -> Unit)? = null
+    ): String {
+        val index = nList.getPoints(GestureCompareUtils.INDEX)
+        val middle = nList.getPoints(GestureCompareUtils.MIDDLE)
+        val ring = nList.getPoints(GestureCompareUtils.RING)
+        val pinky = nList.getPoints(GestureCompareUtils.PINKY)
+        val palm = nList.getPoints(GestureCompareUtils.PALM)[0]
+        val curlList = listOf(
+//            isFingerCurled(index, palm),
+            isFingerCurled(middle, palm),
+            isFingerCurled(ring, palm),
+//            isFingerCurled(pinky, palm)
+        )
+        callback?.invoke(curlList.all { it })
 
+//        return "index: ${curlList[0]}\nmiddle: ${curlList[1]}\nring: ${curlList[2]}\npinky: ${curlList[3]}"
+//        return "middle: ${curlList[0]}\nring: ${curlList[1]}\n}"
+        return ""
+    }
+
+    private fun isFingerCurled(list: List<Point>, palm: Point): Boolean {
+        return list[0].z > list[2].z && list[0].z > list[3].z
+                && palm.z > list[0].z
+    }
+
+    @Deprecated("Biased with up direction and would ignore downwards dir in most cases")
     // Works well to detect close hand but biased with thumb up
     fun process2(
         nList: List<LandmarkProto.NormalizedLandmark>,

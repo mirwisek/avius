@@ -155,11 +155,31 @@ class MainActivity : AppCompatActivity(),
                 for (l in multiHandLandmarks) {
                     val list = l.landmarkList
 //                LandmarkProcessor.process(list, packetListeners)
-                    val str = LandmarkProcessor.process2(list) { direction ->
-                        packetListeners.forEach {
-                            it.value.onLandmarkPacket(direction)
+                    // TODO: Uncomment landmark processing
+//                    val str = LandmarkProcessor.process2(list) { direction ->
+//                        packetListeners.forEach {
+//                            it.value.onLandmarkPacket(direction)
+//                        }
+//                    }
+                    var dir = "NA"
+                    var fingersCurled = false
+                    val ns = LandmarkProcessor.processZAxis(list) {
+                        fingersCurled = it
+                    }
+                    LandmarkProcessor.isThumbTipUp(list) {
+                        if (it == 1) {
+                            dir = "UP"
+                        } else if(it == -1) {
+                            dir = "DOWN"
+                        }
+                        if(fingersCurled) {
+                            packetListeners.forEach {  map ->
+                                map.value.onLandmarkPacket(it)
+                            }
                         }
                     }
+//                    var str = "${list[8].z}, ${list[7].z}, ${list[6].z}, ${list[5].z}"
+                    var str = "\n$ns\nDir: $dir"
                     runOnUiThread {
                         labelPoints.text = str
                     }
@@ -266,11 +286,11 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun updateLabel(text: String) {
-//        runOnUiThread {
-//            labelText.text = text
-////            handler.removeCallbacksAndMessages(null)
-////            handler.postDelayed(resetRunnable, 3000L)
-//        }
+        runOnUiThread {
+            labelText.text = text
+//            handler.removeCallbacksAndMessages(null)
+//            handler.postDelayed(resetRunnable, 3000L)
+        }
     }
 
     override fun onResume() {
