@@ -40,6 +40,8 @@ class StartFragment : Fragment(), OnPacketListener {
     // A variable to disable input while a dialog is in focus and waiting client input
     private var shouldTakeInput = false
     private var themeColor: Int = -1
+    // Flag to control the invoking of listener only once
+    private var isThumbComplete = false
 
     companion object {
         const val TAG = "Avius.StartFragment"
@@ -57,19 +59,16 @@ class StartFragment : Fragment(), OnPacketListener {
     }
 
     override fun onDetach() {
+        log("Detached")
         super.onDetach()
         thumbFinishListener = null
     }
 
     // Make sure there are no pending callbacks, on Exit
     override fun onDestroy() {
+        log("Start fragment destoyred")
         handler.removeCallbacksAndMessages(null)
-        requireActivity().apply {
-            if(this is MainActivity) {
-                // Start Listening to packets
-                this.removePacketListener(TAG)
-            }
-        }
+        unregisterPacketListener()
         super.onDestroy()
     }
 
@@ -152,7 +151,7 @@ class StartFragment : Fragment(), OnPacketListener {
         val gestureButton = view.findViewById<GestureButton>(R.id.gestureButton).apply {
             changeCircleColor(themeColor)
             setOnClickListener {
-                thumbFinishListener?.onStartFragmentFinished()
+                onThumbDetectedSuccess()
             }
         }
         val progressBar = gestureButton.progressBar
@@ -163,10 +162,34 @@ class StartFragment : Fragment(), OnPacketListener {
             } else {
                 progressBar.progress = it
             }
+            // 0 - 30 (in increments of 3)
+            if(!isThumbComplete && it == 27) {
+                isThumbComplete = true
+                vmStart.progressBar.removeObservers(viewLifecycleOwner)
+                onThumbDetectedSuccess()
+            }
         }
 
         // Start taking input
         shouldTakeInput = true
+    }
+
+    /*
+     * When thumb is detected we don't want to call the listener more than once
+     * since it is performing fragment transaction which will allow looping sound and performance glitch
+     */
+    private fun onThumbDetectedSuccess() {
+        thumbFinishListener?.onStartFragmentFinished()
+        thumbFinishListener = null
+    }
+
+    private fun unregisterPacketListener() {
+        requireActivity().apply {
+            if(this is MainActivity) {
+                // Start Listening to packets
+                this.removePacketListener(TAG)
+            }
+        }
     }
 
     private fun getCountDownTimer(): CountDownTimer {
@@ -206,7 +229,6 @@ class StartFragment : Fragment(), OnPacketListener {
         } else {
             countDownTimer?.cancel()
             countDownTimer = null
-            thumbFinishListener?.onStartFragmentFinished()
         }
     }
 

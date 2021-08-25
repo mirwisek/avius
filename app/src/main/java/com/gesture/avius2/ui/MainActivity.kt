@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.Size
 import android.view.*
@@ -15,6 +17,7 @@ import androidx.annotation.RawRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.gesture.avius2.R
 import com.gesture.avius2.customui.CustomDialog
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity(),
     StartFragment.OnThumbDetectionFinishListener,
     QuestionsFragment.OnSurveyCompleteListener,
     SubscriptionFragment.OnCountDownCompleteListener {
+
+    var isTransitioningFragment: Boolean = false
 
     // {@link SurfaceTexture} where the camera-preview frames can be accessed.
     private var previewFrameTexture: SurfaceTexture? = null
@@ -147,7 +152,7 @@ class MainActivity : AppCompatActivity(),
                 OUTPUT_LANDMARKS_STREAM_NAME
             ) { packet: Packet ->
 
-                updateLabel("")
+//                updateLabel("")
 
                 val multiHandLandmarks =
                     PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser())
@@ -161,17 +166,17 @@ class MainActivity : AppCompatActivity(),
 //                            it.value.onLandmarkPacket(direction)
 //                        }
 //                    }
-                    var dir = "NA"
+//                    var dir = "NA"
                     var fingersCurled = false
                     val ns = LandmarkProcessor.processZAxis(list) {
                         fingersCurled = it
                     }
                     LandmarkProcessor.isThumbTipUp(list) {
-                        if (it == 1) {
-                            dir = "UP"
-                        } else if(it == -1) {
-                            dir = "DOWN"
-                        }
+//                        if (it == 1) {
+//                            dir = "UP"
+//                        } else if(it == -1) {
+//                            dir = "DOWN"
+//                        }
                         if(fingersCurled) {
                             packetListeners.forEach {  map ->
                                 map.value.onLandmarkPacket(it)
@@ -179,10 +184,10 @@ class MainActivity : AppCompatActivity(),
                         }
                     }
 //                    var str = "${list[8].z}, ${list[7].z}, ${list[6].z}, ${list[5].z}"
-                    var str = "\n$ns\nDir: $dir"
-                    runOnUiThread {
-                        labelPoints.text = str
-                    }
+//                    var str = "\n$ns\nDir: $dir"
+//                    runOnUiThread {
+//                        labelPoints.text = str
+//                    }
                 }
 
             }
@@ -252,9 +257,11 @@ class MainActivity : AppCompatActivity(),
          * Timeout logic tries to restart but the input is considered also that switches to subscript fragment
          * in this case we don't want timeout to interrupt and let Subscription take lead
          */
-        val frag = supportFragmentManager.findFragmentByTag(SubscriptionFragment.TAG)
-        if(frag?.isVisible == false)
-            setUpStartFragment()
+        isTransitioningFragment = true
+        setUpStartFragment()
+        Handler(Looper.myLooper()!!).postDelayed({
+            isTransitioningFragment = false
+        }, 1500)
     }
 
     // On count down finish, restart with the StartFragment again

@@ -332,7 +332,7 @@ class QuestionsFragment : Fragment() , OnPacketListener {
     }
 
     override fun onLandmarkPacket(direction: Int) {
-        if(shouldTakeInput) {
+        if(shouldTakeInput && !mainActivity!!.isTransitioningFragment) {
             vmQuestions.thumbStatus.postValue(direction)
         }
     }
